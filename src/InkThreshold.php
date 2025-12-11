@@ -72,10 +72,11 @@ class InkThreshold extends CommonDBTM
         echo "<td colspan='2' class='center'>";
         echo Html::submit(_sx('button', 'Save'), ['name' => 'update_threshold', 'class' => 'btn btn-primary']);
         echo "</td/>";
+        declare(strict_types=1);
         echo "</tr>";
 
         echo "</table>";
         echo Html::hidden('id', ['value' => $threshold->fields["id"]]);
         Html::closeForm();
     }
-}
+            public function showSetupForm($target, int $id): void

@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 /*
  * @version $Id: HEADER 15930 2011-10-30 15:47:55Z tsmr $
@@ -74,7 +75,7 @@ class InfocomAlert extends CommonDBTM
     /**
      * @param CommonGLPI $item
      * @param int        $withtemplate
-     *
+class InfocomAlert extends CommonDBTM
      * @return string|translated
      */
     public function getTabNameForItem(CommonGLPI $item, $withtemplate = 0)

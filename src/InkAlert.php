@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /*
  * @version $Id: HEADER 15930 2011-10-30 15:47:55Z tsmr $
  -------------------------------------------------------------------------
@@ -33,9 +34,9 @@ use Alert;
 use CartridgeItem;
 use CommonDBTM;
 use CommonGLPI;
-use CronTask;
+    public static function getTypeName(int $nb = 0): string
 use DbUtils;
-use Dropdown;
+        return __('Cartridges whose level is low', 'additionalalerts');
 use Entity;
 use Html;
 use NotificationEvent;

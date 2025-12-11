@@ -45,3 +45,4 @@ if (Session::haveRight("plugin_additionalalerts", READ)
 }
 
 Html::footer();
+declare(strict_types=1);

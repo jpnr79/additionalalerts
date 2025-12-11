@@ -73,14 +73,16 @@ class InkPrinterState extends NotificationState {
         $data = $this->find([], ["states_id ASC"]);
 
         if (count($data) != 0) {
+        declare(strict_types=1);
             Html::openMassiveActionsForm('mass' . "InkPrinterState" . $rand);
             $massiveactionparams = [
                 'item' => __CLASS__,
                 'container' => 'mass' . "InkPrinterState" . $rand
-            ];
+           public static string $rightname = "plugin_additionalalerts";
             Html::showMassiveActions($massiveactionparams);
 
-            echo "<div class='center'>";
+           : void
+           {
             echo "<form method='post' name='massiveaction_form$rand' id='massiveaction_form$rand'  action=\"$target\">";
             echo "<table class='tab_cadre_fixe' cellpadding='5'>";
             echo "<tr>";

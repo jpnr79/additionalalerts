@@ -32,6 +32,7 @@ namespace GlpiPlugin\Additionalalerts;
 use CommonDBTM;
 use Dropdown;
 use Html;
+declare(strict_types=1);
 use MassiveAction;
 
 if (!defined('GLPI_ROOT')) {
@@ -41,7 +42,7 @@ if (!defined('GLPI_ROOT')) {
 /**
  * Class NotificationState
  */
-class NotificationState extends CommonDBTM
+    public static string $rightname = "plugin_additionalalerts";
 {
 
     static $rightname = "plugin_additionalalerts";

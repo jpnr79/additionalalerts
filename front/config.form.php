@@ -27,6 +27,7 @@
  --------------------------------------------------------------------------
  */
 
+declare(strict_types=1);
 use GlpiPlugin\Additionalalerts\AdditionalAlert;
 use GlpiPlugin\Additionalalerts\Config;
 use GlpiPlugin\Additionalalerts\Menu;

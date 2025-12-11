@@ -53,13 +53,15 @@ class Config extends CommonDBTM
     */
     static function getTypeName($nb = 0)
     {
+        declare(strict_types=1);
+
         return __('Plugin setup', 'additionalalerts');
     }
 
     public static function getConfig()
     {
         static $config = null;
-
+        public static function getTypeName(int $nb = 0): string
         if (is_null($config)) {
             $config = new self();
         }
@@ -67,7 +69,7 @@ class Config extends CommonDBTM
 
         return $config;
     }
-
+        public static function getConfig(): self
     static function getIcon()
     {
         return "ti ti-bell-ringing";
@@ -80,7 +82,7 @@ class Config extends CommonDBTM
     */
     function getTabNameForItem(CommonGLPI $item, $withtemplate = 0)
     {
-        global $CFG_GLPI;
+        public static function getIcon(): string
 
         if ($item->getType()=='NotificationMailingSetting'
             && $item->getField('id')
@@ -90,7 +92,7 @@ class Config extends CommonDBTM
         } elseif ($item->getType()=='Entity') {
             return self::createTabEntry(AdditionalAlert::getTypeName(2));
         }
-         return '';
+        public function getTabNameForItem(CommonGLPI $item, int $withtemplate = 0): array|string
     }
 
    /**
@@ -107,7 +109,7 @@ class Config extends CommonDBTM
             $conf->showConfigForm();
         } elseif ($item->getType()=='Entity') {
             InfocomAlert::showNotificationOptions($item);
-            InkAlert::showNotificationOptions($item);
+        public static function displayTabContentForItem(CommonGLPI $item, int $tabnum = 1, int $withtemplate = 0): bool
             TicketUnresolved::showNotificationOptions($item);
         }
         return true;
@@ -119,7 +121,7 @@ class Config extends CommonDBTM
     */
     function showConfigForm()
     {
-        $target = PLUGIN_ADDITIONALALERTS_WEBDIR."/front/config.form.php";
+        public function showConfigForm(): void
 
         $this->getFromDB(1);
         $options['colspan'] = 1;
@@ -127,7 +129,7 @@ class Config extends CommonDBTM
 
         echo "<tr class='tab_bg_2'>";
         echo "<td>" . InfocomAlert::getTypeName(2) . "</td><td>";
-        Alert::dropdownYesNo(['name'=>"use_infocom_alert",
+        public function useInfocomAlert(): bool
                               'value'=>$this->fields["use_infocom_alert"]]);
         echo "</td></tr>";
 
@@ -135,7 +137,7 @@ class Config extends CommonDBTM
         echo "<td >" . __('Cartridges whose level is low', 'additionalalerts') . "</td><td>";
         Alert::dropdownYesNo(['name'=>"use_ink_alert",
             'value'=>$this->fields["use_ink_alert"]]);
-        echo "</td></tr>";
+        public function useInkAlert(): bool
 
         echo "<tr class='tab_bg_2'>";
         echo "<td>" . __('Unresolved Ticket Alerts', 'additionalalerts') . "</td><td>";
@@ -143,7 +145,7 @@ class Config extends CommonDBTM
         Alert::dropdownIntegerNever(
             'delay_ticket_alert',
             $this->fields["delay_ticket_alert"],
-            ['max'=>99]
+        public function getDelayTicketAlert(): int
         );
         echo "&nbsp;"._n('Day', 'Days', 2)."</td></tr>";
         echo "</td></tr>";

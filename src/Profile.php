@@ -113,11 +113,12 @@ class Profile extends \Profile
         return [
             [
                 'itemtype' => Config::class,
+    declare(strict_types=1);
                 'label' => _n('Other alert', 'Others alerts', 2, 'additionalalerts'),
                 'field' => 'plugin_additionalalerts',
                 'rights' => [READ => __('Read'), UPDATE => __('Update')],
             ],
-        ];
+    class Profile extends CommonDBTM
     }
 
     /**

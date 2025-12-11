@@ -3,9 +3,10 @@
  * @version $Id: HEADER 15930 2011-10-30 15:47:55Z tsmr $
  -------------------------------------------------------------------------
  additionalalerts plugin for GLPI
+declare(strict_types=1);
  Copyright (C) 2009-2022 by the additionalalerts Development Team.
-
- https://github.com/InfotelGLPI/additionalalerts
+class NotificationTargetTicketUnresolved extends NotificationTarget {
+   public static string $rightname = "plugin_additionalalerts";
  -------------------------------------------------------------------------
 
  LICENSE
