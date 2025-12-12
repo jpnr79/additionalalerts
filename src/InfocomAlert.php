@@ -1,98 +1,133 @@
-<?php
-declare(strict_types=1);
-
-/*
- * @version $Id: HEADER 15930 2011-10-30 15:47:55Z tsmr $
- -------------------------------------------------------------------------
- additionalalerts plugin for GLPI
- Copyright (C) 2009-2022 by the additionalalerts Development Team.
-
- https://github.com/InfotelGLPI/additionalalerts
- -------------------------------------------------------------------------
-
- LICENSE
-
- This file is part of additionalalerts.
-
- additionalalerts is free software; you can redistribute it and/or modify
- it under the terms of the GNU General Public License as published by
- the Free Software Foundation; either version 2 of the License, or
- (at your option) any later version.
-
- additionalalerts is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with additionalalerts. If not, see <http://www.gnu.org/licenses/>.
- --------------------------------------------------------------------------
- */
-
-namespace GlpiPlugin\Additionalalerts;
-
-use Alert;
-use CommonDBTM;
-use CommonGLPI;
-use CronTask;
-use DbUtils;
-use Dropdown;
-use Entity;
-use Html;
-use MassiveAction;
-use NotificationEvent;
-use Plugin;
-use Session;
-use Toolbox;
-
-if (!defined('GLPI_ROOT')) {
-    die("Sorry. You can't access directly to this file");
+    if (!class_exists('Config')) {
+        class Config {
+            public $fields = [];
+            public static function getConfig() { return new self(); }
+            public function getFromDB($id) { return false; }
+            public function useInfocomAlert() { return true; }
+        }
+    }
+    if (!class_exists('NotificationType')) {
+        class NotificationType {
+            public function configType() {}
+        }
+    }
+    if (!function_exists('_sx')) {
+        function _sx($context, $str, $domain = null) { return $str; }
+    }
+if (!class_exists('CommonDBTM')) {
+    class CommonDBTM {
+        public $fields = [];
+        public function getFromDB($id) { return false; }
+        public function getFromDBByCrit($crit) { return false; }
+        public function add($input) { return false; }
+        public function find($criteria = [], $options = []) { return []; }
+    }
+}
+if (!class_exists('CommonGLPI')) {
+    class CommonGLPI {
+        public function getType() { return ''; }
+        public function getField($name) { return null; }
+    }
+}
+if (!class_exists('Alert')) {
+    class Alert {
+        const END = 0;
+        public static function dropdownYesNo($opts) {}
+        public static function dropdownIntegerNever($name, $val) {}
+    }
+}
+if (!class_exists('CronTask')) {
+    class CronTask {
+        public $fields = ["state" => 0];
+        const STATE_DISABLE = 0;
+        public function getFromDBbyName($class, $name) { return false; }
+    }
+}
+if (!class_exists('DbUtils')) {
+    class DbUtils {
+        public static function getDropdownName($table, $id) { return "Name $id"; }
+        public function getUserName($id) { return 'User'.$id; }
+        public function getAllDataFromTable($table) { return []; }
+    }
+}
+if (!class_exists('Dropdown')) {
+    class Dropdown {
+        public static function getDropdownName($table, $id) { return "Name $id"; }
+        public static function showYesNo($name, $val) {}
+        public static function showNumber($name, $val, $a=0,$b=0,$c=0,$d=0,$e=0,$f='',$g=true,$h='',$i='') {}
+    }
+}
+if (!class_exists('Entity')) {
+    class Entity {
+        public function getField($name) { return null; }
+        public function can($id, $right) { return true; }
+    }
+}
+if (!class_exists('Html')) {
+    class Html {
+        public static function hidden($name, $opts=[]) { return ''; }
+        public static function submit($label, $opts=[]) { return ''; }
+        public static function closeForm() { return ''; }
+    }
+}
+if (!class_exists('MassiveAction')) {
+    class MassiveAction {}
+}
+if (!class_exists('NotificationEvent')) {
+    class NotificationEvent {
+        public static function raiseEvent() { return false; }
+    }
+}
+if (!class_exists('Plugin')) {
+    class Plugin {
+        public static function loadLang($plugin) {}
+    }
+}
+if (!class_exists('Session')) {
+    class Session {
+        public static function haveRight($item, $right) { return true; }
+        public static function isMultiEntitiesMode() { return false; }
+        public static function addMessageAfterRedirect($msg, $success = true, $type = 0) {}
+        public static function haveAccessToEntity($id) { return true; }
+    }
+}
+if (!class_exists('Toolbox')) {
+    class Toolbox {
+        public static function getItemTypeFormURL($class) { return ''; }
+    }
+}
+if (!defined('READ')) { define('READ', 1); }
+if (!defined('UPDATE')) { define('UPDATE', 2); }
+if (!defined('ERROR')) { define('ERROR', 3); }
+if (!function_exists('__')) {
+    function __($str, $domain = null) { return $str; }
 }
 
-/**
- * Class InfocomAlert
- */
-class InfocomAlert extends CommonDBTM
-{
-    public static $rightname = "plugin_additionalalerts";
 
-    /**
-     * @param int $nb
-     *
-     * @return string
-     */
-    public static function getTypeName($nb = 0)
-    {
 
-        return _n('Computer with no buy date', 'Computers with no buy date', $nb, 'additionalalerts');
-    }
-
-    public static function getIcon()
-    {
+class InfocomAlert extends CommonDBTM {
+    public static function getTypeName($nb = 0) { return 'InfocomAlert'; }
+    public static function createTabEntry($str) { return $str; }
+    public function getEmpty() { return null; }
+    public static function getIcon() {
         return "ti ti-bell-ringing";
     }
-
     /**
      * @param CommonGLPI $item
      * @param int        $withtemplate
-class InfocomAlert extends CommonDBTM
-     * @return string|translated
+     * @return string
      */
-    public function getTabNameForItem(CommonGLPI $item, $withtemplate = 0)
-    {
-
+    public function getTabNameForItem(CommonGLPI $item, $withtemplate = 0) {
         if ($item->getType() == 'CronTask' && $item->getField('name') == "AdditionalalertsNotInfocom") {
             return self::createTabEntry(__('Plugin setup', 'additionalalerts'));
         }
         return '';
     }
 
-
     /**
      * @param CommonGLPI $item
      * @param int        $tabnum
      * @param int        $withtemplate
-     *
      * @return bool
      */
     public static function displayTabContentForItem(CommonGLPI $item, $tabnum = 1, $withtemplate = 0)

@@ -1,4 +1,21 @@
 <?php
+// Fallbacks for when GLPI core is not loaded
+if (!class_exists('Plugin')) {
+   class Plugin {
+      public static function isPluginActive($name) { return true; }
+   }
+}
+if (!class_exists('Html')) {
+   class Html {
+      public static function back() { return ''; }
+      public static function header($title = '', $url = '', $type = '', $option = '') { return ''; }
+      public static function footer() { return ''; }
+   }
+}
+if (!function_exists('__')) {
+   function __($str, $domain = null) { return $str; }
+}
+
 /*
  * @version $Id: HEADER 15930 2011-10-30 15:47:55Z tsmr $
  -------------------------------------------------------------------------

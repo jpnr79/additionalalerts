@@ -42,10 +42,10 @@ if (!defined('GLPI_ROOT')) {
 /**
  * Class NotificationState
  */
-    public static string $rightname = "plugin_additionalalerts";
+class NotificationState extends CommonDBTM
 {
 
-    static $rightname = "plugin_additionalalerts";
+    public static $rightname = "plugin_additionalalerts";
 
 
    /**

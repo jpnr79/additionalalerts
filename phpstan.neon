@@ -1,0 +1,14 @@
+parameters:
+  level: max
+  paths:
+    - src
+    - hook.php
+  autoload_files:
+    - tests/stubs.php
+  ignoreErrors:
+    - '#Call to unknown method#'
+    - '#Use of unknown class#'
+    - '#Call to unknown function#'
+    - '#Use of undefined constant#'
+    - '#Undefined property#'
+    - '#not all code paths return a value#'

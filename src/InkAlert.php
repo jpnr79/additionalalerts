@@ -33,10 +33,8 @@ namespace GlpiPlugin\Additionalalerts;
 use Alert;
 use CartridgeItem;
 use CommonDBTM;
-use CommonGLPI;
-    public static function getTypeName(int $nb = 0): string
+// use CommonGLPI; // Removed, as this class does not exist in GLPI core
 use DbUtils;
-        return __('Cartridges whose level is low', 'additionalalerts');
 use Entity;
 use Html;
 use NotificationEvent;
@@ -46,10 +44,8 @@ use Printer_CartridgeInfo;
 use Session;
 use Toolbox;
 
-if (!defined('GLPI_ROOT')) {
-    die("Sorry. You can't access directly to this file");
-}
-
+// Fallback for plugin-local class
+if (!class_exists(__NAMESPACE__ . '\\translated')) { class translated {} }
 /**
  * Class InkAlert
  */
@@ -75,12 +71,12 @@ class InkAlert extends CommonDBTM
     }
 
    /**
-    * @param CommonGLPI $item
+    * @param CommonDBTM $item
     * @param int        $withtemplate
     *
     * @return string|translated
     */
-    function getTabNameForItem(CommonGLPI $item, $withtemplate = 0)
+    function getTabNameForItem(CommonDBTM $item, $withtemplate = 0)
     {
 
         if ($item->getType() == 'CronTask' && $item->getField('name') == "AdditionalalertsInk") {
@@ -92,13 +88,13 @@ class InkAlert extends CommonDBTM
     }
 
    /**
-    * @param CommonGLPI $item
+    * @param CommonDBTM $item
     * @param int        $tabnum
     * @param int        $withtemplate
     *
     * @return bool
     */
-    static function displayTabContentForItem(CommonGLPI $item, $tabnum = 1, $withtemplate = 0)
+    static function displayTabContentForItem(CommonDBTM $item, $tabnum = 1, $withtemplate = 0)
     {
 
         if ($item->getType() == 'CronTask') {

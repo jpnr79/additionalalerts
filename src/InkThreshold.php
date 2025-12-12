@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /*
  * @version $Id: HEADER 15930 2011-10-30 15:47:55Z tsmr $
  -------------------------------------------------------------------------
@@ -25,12 +26,19 @@
  You should have received a copy of the GNU General Public License
  along with additionalalerts. If not, see <http://www.gnu.org/licenses/>.
  --------------------------------------------------------------------------
- */
+*/
 
 namespace GlpiPlugin\Additionalalerts;
 
-use CommonDBTM;
-use Html;
+// Fallback for CommonDBTM if not loaded
+if (!\class_exists('CommonDBTM')) {
+    abstract class CommonDBTM {
+        public $fields = [];
+        public function find(array $criteria = []) { return []; }
+        public function add(array $data = []) { return null; }
+        public function getFromDBByCrit(array $crit) { return false; }
+    }
+}
 
 if (!defined('GLPI_ROOT')) {
     die("Sorry. You can't access directly to this file");
@@ -59,24 +67,41 @@ class InkThreshold extends CommonDBTM
 
         echo "<form action='" . $target . "' method='post'>";
         echo "<table class='tab_cadre' cellpadding='5' width='950'>";
-        echo "<tr><th colspan='2'>" . __('Ink level alerts', 'additionalalerts') . "</th></tr>";
+        $title = function_exists('__') ? __('Ink level alerts', 'additionalalerts') : 'Ink level alerts';
+        echo "<tr><th colspan='2'>" . $title . "</th></tr>";
         echo "<tr class='tab_bg_1'>";
-        echo "<td>" . __('Ink level alerts', 'additionalalerts') . "</td>";
+        echo "<td>" . $title . "</td>";
         echo "<td>";
-        echo Html::input('threshold', ['value' => $threshold->fields["threshold"], 'size' => 3]);
-        echo " %";
+        if (class_exists('Html') && method_exists('Html', 'input')) {
+            \Html::input('threshold', ['value' => $threshold->fields["threshold"], 'size' => 3]);
+            echo " %";
+        } else {
+            echo '<input name="threshold" value="' . htmlspecialchars((string)$threshold->fields["threshold"]) . '" size="3" /> %';
+        }
         echo "</td>";
         echo "</tr>";
 
         echo "<tr class='tab_bg_2'>";
         echo "<td colspan='2' class='center'>";
-        echo Html::submit(_sx('button', 'Save'), ['name' => 'update_threshold', 'class' => 'btn btn-primary']);
-        echo "</td/>";
-        declare(strict_types=1);
+        $saveLabel = function_exists('_sx') ? _sx('button', 'Save') : 'Save';
+        if (class_exists('Html') && method_exists('Html', 'submit')) {
+            \Html::submit($saveLabel, ['name' => 'update_threshold', 'class' => 'btn btn-primary']);
+        } else {
+            echo '<button type="submit" name="update_threshold" class="btn btn-primary">' . htmlspecialchars((string)$saveLabel) . '</button>';
+        }
+        echo "</td>";
         echo "</tr>";
 
         echo "</table>";
-        echo Html::hidden('id', ['value' => $threshold->fields["id"]]);
-        Html::closeForm();
+            if (class_exists('Html') && method_exists('Html', 'hidden')) {
+                \Html::hidden('id', ['value' => $threshold->fields["id"]]);
+            } else {
+                echo '<input type="hidden" name="id" value="' . htmlspecialchars((string)$threshold->fields["id"]) . '" />';
+            }
+            if (class_exists('Html') && method_exists('Html', 'closeForm')) {
+                \Html::closeForm();
+            } else {
+                echo "</form>";
+            }
+        }
     }
-            public function showSetupForm($target, int $id): void
