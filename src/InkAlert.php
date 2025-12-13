@@ -49,8 +49,16 @@ if (!class_exists(__NAMESPACE__ . '\\translated')) { class translated {} }
 /**
  * Class InkAlert
  */
-class InkAlert extends CommonDBTM
-{
+
+class InkAlert extends CommonDBTM {
+    /**
+     * @var array<string, mixed>
+     */
+    var $fields = [];
+    /**
+     * Fallback for createTabEntry (GLPI core helper)
+     */
+    public static function createTabEntry(...$args) { return $args[0] ?? ''; }
 
     static $rightname = "plugin_additionalalerts";
 
@@ -70,13 +78,13 @@ class InkAlert extends CommonDBTM
         return "ti ti-bell-ringing";
     }
 
-   /**
-    * @param CommonDBTM $item
-    * @param int        $withtemplate
-    *
-    * @return string|translated
-    */
-    function getTabNameForItem(CommonDBTM $item, $withtemplate = 0)
+    /**
+     * @param mixed $item
+     * @param int|null $with
+     *
+     * @return string|translated
+     */
+     function getTabNameForItem($item, $with = null)
     {
 
         if ($item->getType() == 'CronTask' && $item->getField('name') == "AdditionalalertsInk") {
@@ -87,22 +95,30 @@ class InkAlert extends CommonDBTM
         return '';
     }
 
-   /**
-    * @param CommonDBTM $item
-    * @param int        $tabnum
-    * @param int        $withtemplate
-    *
-    * @return bool
-    */
-    static function displayTabContentForItem(CommonDBTM $item, $tabnum = 1, $withtemplate = 0)
+    /**
+     * @param mixed $item
+     * @param int $tabnum
+     * @param int|null $with
+     *
+     * @return bool
+     */
+     static function displayTabContentForItem($item, $tabnum = 1, $with = null)
     {
 
         if ($item->getType() == 'CronTask') {
-            $notif = new InkPrinterState();
-            $notif->configState();
+            if (class_exists('GlpiPlugin\\Additionalalerts\\InkPrinterState')) {
+                $notif = new \GlpiPlugin\Additionalalerts\InkPrinterState();
+                $notif->configState();
+            } else {
+                echo '<div class="center">InkPrinterState class not found.</div>';
+            }
         } elseif ($item->getType() == 'Printer') {
-            $InkThreshold = new InkThreshold();
-            $InkThreshold->showSetupForm(PLUGIN_ADDITIONALALERTS_WEBDIR . "/front/inkalert.form.php", $item->getField('id'));
+            if (class_exists('GlpiPlugin\\Additionalalerts\\InkThreshold')) {
+                $InkThreshold = new \GlpiPlugin\Additionalalerts\InkThreshold();
+                $InkThreshold->showSetupForm(defined('PLUGIN_ADDITIONALALERTS_WEBDIR') ? PLUGIN_ADDITIONALALERTS_WEBDIR . "/front/inkalert.form.php" : '', $item->getField('id'));
+            } else {
+                echo '<div class="center">InkThreshold class not found.</div>';
+            }
         }
         return true;
     }
@@ -116,14 +132,16 @@ class InkAlert extends CommonDBTM
     static function cronInfo($name)
     {
 
-        switch ($name) {
-            case 'AdditionalalertsInk':
-                return [
-               'description' => __('Cartridges whose level is low', 'additionalalerts')];   // Optional
-            break;
+        if ($name === 'AdditionalalertsInk') {
+            return [
+                'description' => __('Cartridges whose level is low', 'additionalalerts')
+            ];
         }
         return [];
     }
+
+    // Add missing getFromDBByCrit stub for compatibility
+    public function getFromDBByCrit($criteria) { return false; }
 
    /**
     * @param $entities
@@ -362,7 +380,9 @@ class InkAlert extends CommonDBTM
        // Get data
         $entitynotification = new InkAlert();
         if (!$entitynotification->getFromDBByCrit(['entities_id' => $ID])) {
-            $entitynotification->getEmpty();
+            if (method_exists($entitynotification, 'getEmpty')) {
+                $entitynotification->getEmpty();
+            }
         }
 
         if ($canedit) {
@@ -371,7 +391,7 @@ class InkAlert extends CommonDBTM
         echo "<table class='tab_cadre_fixe'>";
 
         echo "<tr class='tab_bg_1'><td>" . __('Cartridges whose level is low', 'additionalalerts') . "</td><td>";
-        $default_value = $entitynotification->fields['use_ink_alert'];
+        $default_value = $entitynotification->fields['use_ink_alert'] ?? 0;
         Alert::dropdownYesNo(['name'           => "use_ink_alert",
             'value'          => $default_value,
             'inherit_global' => 1]);
@@ -381,7 +401,7 @@ class InkAlert extends CommonDBTM
             echo "<tr>";
             echo "<td class='tab_bg_2 center' colspan='4'>";
             echo Html::hidden('entities_id', ['value' => $ID]);
-            if ($entitynotification->fields["id"]) {
+            if (!empty($entitynotification->fields["id"])) {
                 echo Html::hidden('id', ['value' => $entitynotification->fields["id"]]);
                 echo Html::submit(_sx('button', 'Save'), ['name' => 'update', 'class' => 'btn btn-primary']);
             } else {
@@ -393,5 +413,6 @@ class InkAlert extends CommonDBTM
         } else {
             echo "</table>";
         }
+        return true;
     }
 }

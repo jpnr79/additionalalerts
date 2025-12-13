@@ -117,6 +117,14 @@ class AdditionalAlert extends CommonDBTM
         return _n('Other alert', 'Others alerts', $nb, 'additionalalerts');
     }
 
+    /**
+     * Return a form URL for this alert type (stub for menu/link generation)
+     */
+    public static function getFormURL($withid = false)
+    {
+        return PLUGIN_ADDITIONALALERTS_WEBDIR.'/front/additionalalert.form.php';
+    }
+
     static function displayAlerts()
     {
         global $DB;

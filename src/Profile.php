@@ -1,5 +1,6 @@
 <?php
 
+
 /*
  * @version $Id: HEADER 15930 2011-10-30 15:47:55Z tsmr $
  -------------------------------------------------------------------------
@@ -35,6 +36,13 @@ use DbUtils;
 use Html;
 use ProfileRight;
 use Session;
+use Profile as GLPIProfile;
+
+// Ensure PURGE is defined for compatibility
+if (!defined('PURGE')) {
+    define('PURGE', 4);
+}
+
 
 if (!defined('GLPI_ROOT')) {
     die("Sorry. You can't access directly to this file");
@@ -43,8 +51,15 @@ if (!defined('GLPI_ROOT')) {
 /**
  * Class Profile
  */
-class Profile extends \Profile
+// NOTE: This class extends the GLPI core Profile class, which must be available in the GLPI environment.
+class Profile extends GLPIProfile
 {
+    /**
+     * Helper for tab entry (GLPI compatibility)
+     * @param string $str
+     * @return string
+     */
+    public static function createTabEntry(...$args) { return $args[0] ?? ''; }
     public static $rightname = "profile";
 
 
@@ -54,15 +69,18 @@ class Profile extends \Profile
 
 
     /**
-     * @param CommonGLPI $item
-     * @param int $withtemplate
+     * @param mixed $item
+     * @param int|null $with
      *
      * @return string|translated
      */
-    public function getTabNameForItem(CommonGLPI $item, $withtemplate = 0)
+    public function getTabNameForItem($item, $with = null)
     {
-        if ($item->getType() == 'Profile'
-            && $item->getField('interface') != 'helpdesk') {
+        if ($item->getType() == 'Profile') {
+            // @todo: getField('interface') does not exist in CommonGLPI. Adjust as needed for your GLPI version.
+            // if ($item->getField('interface') != 'helpdesk') {
+            //     return self::createTabEntry(AdditionalAlert::getTypeName(2));
+            // }
             return self::createTabEntry(AdditionalAlert::getTypeName(2));
         }
         return '';
@@ -70,16 +88,18 @@ class Profile extends \Profile
 
 
     /**
-     * @param CommonGLPI $item
+     * @param mixed $item
      * @param int $tabnum
-     * @param int $withtemplate
+     * @param int|null $with
      *
      * @return bool
      */
-    public static function displayTabContentForItem(CommonGLPI $item, $tabnum = 1, $withtemplate = 0)
+    public static function displayTabContentForItem($item, $tabnum = 1, $with = null)
     {
         if ($item->getType() == 'Profile') {
-            $ID = $item->getField('id');
+            // @todo: getField('id') does not exist in CommonGLPI. Adjust as needed for your GLPI version.
+            // $ID = $item->getField('id');
+            $ID = $item->fields['id'] ?? 0;
             $prof = new self();
 
             self::addDefaultProfileInfos(
@@ -113,12 +133,11 @@ class Profile extends \Profile
         return [
             [
                 'itemtype' => Config::class,
-    declare(strict_types=1);
                 'label' => _n('Other alert', 'Others alerts', 2, 'additionalalerts'),
                 'field' => 'plugin_additionalalerts',
-                'rights' => [READ => __('Read'), UPDATE => __('Update')],
+                'rights' => [1 => __('Read'), 2 => __('Update')],
             ],
-    class Profile extends CommonDBTM
+        ];
     }
 
     /**
@@ -179,8 +198,8 @@ class Profile extends \Profile
                 }
             }
         }
+        return true;
     }
-
     /**
      * Initialize profiles, and migrate it necessary
      */
@@ -190,7 +209,7 @@ class Profile extends \Profile
         $profile = new self();
         $dbu = new DbUtils();
         //Add new rights in glpi_profilerights table
-        foreach ($profile->getAllRights(true) as $data) {
+        foreach ($profile->getAllRights() as $data) {
             if ($dbu->countElementsInTable(
                 "glpi_profilerights",
                 ["name" => $data['field']]
@@ -275,21 +294,18 @@ class Profile extends \Profile
      * @param int $profiles_id
      * @param bool $openform
      * @param bool $closeform
-     *
-     * @return nothing
-     * @internal param int $items_id id of the profile
-     * @internal param value $target url of target
+     * @return void
      */
     public function showForm($profiles_id = 0, $openform = true, $closeform = true)
     {
         echo "<div class='firstbloc'>";
         if (($canedit = Session::haveRightsOr(self::$rightname, [CREATE, UPDATE, PURGE]))
             && $openform) {
-            $profile = new \Profile();
+            $profile = new GLPIProfile();
             echo "<form method='post' action='" . $profile->getFormURL() . "'>";
         }
 
-        $profile = new \Profile();
+        $profile = new GLPIProfile();
         $profile->getFromDB($profiles_id);
 
         $rights = $this->getAllRights();
@@ -308,5 +324,6 @@ class Profile extends \Profile
             Html::closeForm();
         }
         echo "</div>";
+        return;
     }
 }

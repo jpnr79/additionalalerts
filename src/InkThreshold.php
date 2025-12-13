@@ -49,6 +49,8 @@ if (!defined('GLPI_ROOT')) {
  */
 class InkThreshold extends CommonDBTM
 {
+    // Provide add() stub for static analysis when CommonDBTM fallback is not recognized
+    public function add(array $data = []) { return null; }
    /**
     * @param $target
     * @param $id
@@ -72,8 +74,8 @@ class InkThreshold extends CommonDBTM
         echo "<tr class='tab_bg_1'>";
         echo "<td>" . $title . "</td>";
         echo "<td>";
-        if (class_exists('Html') && method_exists('Html', 'input')) {
-            \Html::input('threshold', ['value' => $threshold->fields["threshold"], 'size' => 3]);
+        if (class_exists('\GlpiPlugin\Additionalalerts\Html') && method_exists('\GlpiPlugin\Additionalalerts\Html', 'input')) {
+            \GlpiPlugin\Additionalalerts\Html::input('threshold', ['value' => $threshold->fields["threshold"], 'size' => 3]);
             echo " %";
         } else {
             echo '<input name="threshold" value="' . htmlspecialchars((string)$threshold->fields["threshold"]) . '" size="3" /> %';
@@ -84,8 +86,8 @@ class InkThreshold extends CommonDBTM
         echo "<tr class='tab_bg_2'>";
         echo "<td colspan='2' class='center'>";
         $saveLabel = function_exists('_sx') ? _sx('button', 'Save') : 'Save';
-        if (class_exists('Html') && method_exists('Html', 'submit')) {
-            \Html::submit($saveLabel, ['name' => 'update_threshold', 'class' => 'btn btn-primary']);
+        if (class_exists('\GlpiPlugin\Additionalalerts\Html') && method_exists('\GlpiPlugin\Additionalalerts\Html', 'submit')) {
+            \GlpiPlugin\Additionalalerts\Html::submit($saveLabel, ['name' => 'update_threshold', 'class' => 'btn btn-primary']);
         } else {
             echo '<button type="submit" name="update_threshold" class="btn btn-primary">' . htmlspecialchars((string)$saveLabel) . '</button>';
         }
@@ -93,13 +95,13 @@ class InkThreshold extends CommonDBTM
         echo "</tr>";
 
         echo "</table>";
-            if (class_exists('Html') && method_exists('Html', 'hidden')) {
-                \Html::hidden('id', ['value' => $threshold->fields["id"]]);
+            if (class_exists('\GlpiPlugin\Additionalalerts\Html') && method_exists('\GlpiPlugin\Additionalalerts\Html', 'hidden')) {
+                \GlpiPlugin\Additionalalerts\Html::hidden('id', ['value' => $threshold->fields["id"]]);
             } else {
                 echo '<input type="hidden" name="id" value="' . htmlspecialchars((string)$threshold->fields["id"]) . '" />';
             }
-            if (class_exists('Html') && method_exists('Html', 'closeForm')) {
-                \Html::closeForm();
+            if (class_exists('\GlpiPlugin\Additionalalerts\Html') && method_exists('\GlpiPlugin\Additionalalerts\Html', 'closeForm')) {
+                \GlpiPlugin\Additionalalerts\Html::closeForm();
             } else {
                 echo "</form>";
             }

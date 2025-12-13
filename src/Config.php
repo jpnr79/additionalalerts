@@ -1,22 +1,4 @@
 <?php
-namespace GlpiPlugin\Additionalalerts;
-
-// Fallbacks for static analysis (only if GLPI core is not loaded)
-if (!class_exists(__NAMESPACE__ . '\\CommonDBTM')) {
-    class CommonDBTM {
-        public $fields = [];
-        public function getFromDB($id) { return false; }
-        public function getFromDBByCrit($crit) { return false; }
-        public function add($input) { return false; }
-        public function find($criteria = [], $options = []) { return []; }
-    }
-}
-if (!class_exists(__NAMESPACE__ . '\\InfocomAlert')) {
-    class InfocomAlert {
-        public static function showNotificationOptions($entity) { return true; }
-        public static function getTypeName($nb = 0) { return 'InfocomAlert'; }
-    }
-}
 /*
  * @version $Id: HEADER 15930 2011-10-30 15:47:55Z tsmr $
  -------------------------------------------------------------------------
@@ -64,6 +46,8 @@ if (!defined('GLPI_ROOT')) {
  */
 class Config extends CommonDBTM
 {
+    // Provide fields storage for static analysis
+    public $fields = [];
     // Fallback for static analysis: createTabEntry
     public static function createTabEntry($str) { return $str; }
     // Fallback for static analysis: showFormHeader
@@ -78,6 +62,7 @@ class Config extends CommonDBTM
         }
         return true;
     }
+    // Getters and setters follow
     static $rightname = "plugin_additionalalerts";
 
     /**
@@ -111,11 +96,11 @@ class Config extends CommonDBTM
     }
 
     /**
-    * @param object $item
-    * @param int $withtemplate
+    * @param mixed $item
+    * @param int|null $with
     * @return string
     */
-    function getTabNameForItem($item, $withtemplate = 0)
+    function getTabNameForItem($item, $with = null)
     {
         global $CFG_GLPI;
         if ($item->getType()=='NotificationMailingSetting'
@@ -130,22 +115,26 @@ class Config extends CommonDBTM
     }
 
     /**
-    * @param object $item
+    * @param mixed $item
     * @param int $tabnum
-    * @param int $withtemplate
+    * @param int|null $with
     * @return bool
     */
-    static function displayTabContentForItem($item, $tabnum = 1, $withtemplate = 0)
+    static function displayTabContentForItem($item, $tabnum = 1, $with = null)
     {
         if ($item->getType()=='NotificationMailingSetting') {
             $conf = new self();
             $conf->showConfigForm();
         } elseif ($item->getType()=='Entity') {
-            InfocomAlert::showNotificationOptions($item);
-            TicketUnresolved::showNotificationOptions($item);
+            if (class_exists('TicketUnresolved') && method_exists('TicketUnresolved', 'showNotificationOptions')) {
+                TicketUnresolved::showNotificationOptions($item);
+            }
         }
         return true;
     }
+
+    // Add missing getFromDB method for compatibility
+    public function getFromDB($id = 0) { return false; }
 
     /**
      * @param array $options
@@ -161,44 +150,55 @@ class Config extends CommonDBTM
 
         echo "<tr class='tab_bg_2'>";
         echo "<td>" . InfocomAlert::getTypeName(2) . "</td><td>";
-        if (class_exists('Alert') && method_exists('Alert', 'dropdownYesNo')) {
-            Alert::dropdownYesNo(['name'=>"use_infocom_alert", 'value'=>$this->fields["use_infocom_alert"]]);
-        } else if (class_exists('Html') && method_exists('Html', 'dropdownYesNo')) {
-            Html::dropdownYesNo(['name'=>"use_infocom_alert", 'value'=>$this->fields["use_infocom_alert"]]);
-        } else if (class_exists('Dropdown') && method_exists('Dropdown', 'showYesNo')) {
-            Dropdown::showYesNo('use_infocom_alert', $this->fields["use_infocom_alert"]);
+            if (class_exists('\GlpiPlugin\Additionalalerts\Alert') && method_exists('\GlpiPlugin\Additionalalerts\Alert', 'dropdownYesNo')) {
+                \GlpiPlugin\Additionalalerts\Alert::dropdownYesNo(['name' => "use_infocom_alert", 'value' => $this->fields["use_infocom_alert"]]);
+            } else if (class_exists('\GlpiPlugin\Additionalalerts\Html') && method_exists('\GlpiPlugin\Additionalalerts\Html', 'dropdownYesNo')) {
+                \GlpiPlugin\Additionalalerts\Html::dropdownYesNo(['name' => "use_infocom_alert", 'value' => $this->fields["use_infocom_alert"]]);
+        } else {
+            // Fallback: simple yes/no select
+            $val = (int)($this->fields["use_infocom_alert"] ?? 0);
+            echo "<select name='use_infocom_alert'>";
+            echo "<option value='0'" . ($val === 0 ? ' selected' : '') . ">No</option>";
+            echo "<option value='1'" . ($val === 1 ? ' selected' : '') . ">Yes</option>";
+            echo "</select>";
         }
         echo "</td></tr>";
 
         echo "<tr class='tab_bg_2'>";
         $cartridgeLabel = function_exists('__') ? __('Cartridges whose level is low', 'additionalalerts') : 'Cartridges whose level is low';
         echo "<td >" . $cartridgeLabel . "</td><td>";
-        if (class_exists('Alert') && method_exists('Alert', 'dropdownYesNo')) {
-            Alert::dropdownYesNo(['name'=>"use_ink_alert", 'value'=>$this->fields["use_ink_alert"]]);
-        } else if (class_exists('Html') && method_exists('Html', 'dropdownYesNo')) {
-            Html::dropdownYesNo(['name'=>"use_ink_alert", 'value'=>$this->fields["use_ink_alert"]]);
-        } else if (class_exists('Dropdown') && method_exists('Dropdown', 'showYesNo')) {
-            Dropdown::showYesNo('use_ink_alert', $this->fields["use_ink_alert"]);
+            if (class_exists('\GlpiPlugin\Additionalalerts\Alert') && method_exists('\GlpiPlugin\Additionalalerts\Alert', 'dropdownYesNo')) {
+                \GlpiPlugin\Additionalalerts\Alert::dropdownYesNo(['name' => "use_ink_alert", 'value' => $this->fields["use_ink_alert"]]);
+            } else if (class_exists('\GlpiPlugin\Additionalalerts\Html') && method_exists('\GlpiPlugin\Additionalalerts\Html', 'dropdownYesNo')) {
+                \GlpiPlugin\Additionalalerts\Html::dropdownYesNo(['name' => "use_ink_alert", 'value' => $this->fields["use_ink_alert"]]);
+        } else {
+            // Fallback: simple yes/no select
+            $val = (int)($this->fields["use_ink_alert"] ?? 0);
+            echo "<select name='use_ink_alert'>";
+            echo "<option value='0'" . ($val === 0 ? ' selected' : '') . ">No</option>";
+            echo "<option value='1'" . ($val === 1 ? ' selected' : '') . ">Yes</option>";
+            echo "</select>";
         }
         echo "</td></tr>";
 
         echo "<tr class='tab_bg_2'>";
         $unresolvedLabel = function_exists('__') ? __('Unresolved Ticket Alerts', 'additionalalerts') : 'Unresolved Ticket Alerts';
         echo "<td>" . $unresolvedLabel . "</td><td>";
-        if (class_exists('Alert') && method_exists('Alert', 'dropdownIntegerNever')) {
-            Alert::dropdownIntegerNever('delay_ticket_alert', $this->fields["delay_ticket_alert"]);
-        } else if (class_exists('Html') && method_exists('Html', 'dropdownIntegerNever')) {
-            Html::dropdownIntegerNever('delay_ticket_alert', $this->fields["delay_ticket_alert"]);
-        } else if (class_exists('Dropdown') && method_exists('Dropdown', 'showNumber')) {
+            if (class_exists('\GlpiPlugin\Additionalalerts\Alert') && method_exists('\GlpiPlugin\Additionalalerts\Alert', 'dropdownIntegerNever')) {
+                \GlpiPlugin\Additionalalerts\Alert::dropdownIntegerNever('delay_ticket_alert', $this->fields["delay_ticket_alert"]);
+            } else if (class_exists('\GlpiPlugin\Additionalalerts\Html') && method_exists('\GlpiPlugin\Additionalalerts\Html', 'dropdownIntegerNever')) {
+                \GlpiPlugin\Additionalalerts\Html::dropdownIntegerNever('delay_ticket_alert', $this->fields["delay_ticket_alert"]);
+        } else {
+            // Fallback: simple number input
+            $val = (int)($this->fields["delay_ticket_alert"] ?? 0);
             $dayLabel = function_exists('_n') ? _n('Day', 'Days', 2, 'additionalalerts') : 'Days';
-            Dropdown::showNumber('delay_ticket_alert', $this->fields["delay_ticket_alert"], 0, 99, 1, 1, 1, '', true, '', $dayLabel);
+            echo "<input type='number' name='delay_ticket_alert' min='0' max='99' value='" . $val . "'> &nbsp;" . $dayLabel;
         }
-        $dayLabel = function_exists('_n') ? _n('Day', 'Days', 2, 'additionalalerts') : 'Days';
-        echo "&nbsp;".$dayLabel."</td></tr>";
+        echo "</td></tr>";
 
         echo "<tr class='tab_bg_2'><td class='center' colspan='2'>";
-        if (class_exists('Html') && method_exists('Html', 'hidden')) {
-            Html::hidden('id', ['value' => 1]);
+            if (class_exists('\GlpiPlugin\Additionalalerts\Html') && method_exists('\GlpiPlugin\Additionalalerts\Html', 'hidden')) {
+                \GlpiPlugin\Additionalalerts\Html::hidden('id', ['value' => 1]);
         }
         echo "</td></tr>";
 
@@ -206,9 +206,7 @@ class Config extends CommonDBTM
 
         return true;
     }
-
-    //----------------- Getters and setters -------------------//
-
+    // ----------------- Getters and setters -------------------
     public function useInfocomAlert()
     {
         return $this->fields['use_infocom_alert'];

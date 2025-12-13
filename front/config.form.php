@@ -44,26 +44,25 @@ if (!function_exists('__')) {
  --------------------------------------------------------------------------
  */
 
-declare(strict_types=1);
 use GlpiPlugin\Additionalalerts\AdditionalAlert;
 use GlpiPlugin\Additionalalerts\Config;
 use GlpiPlugin\Additionalalerts\Menu;
 
-if (Plugin::isPluginActive("additionalalerts")) {
+if (\GlpiPlugin\Additionalalerts\Plugin::isPluginActive("additionalalerts")) {
 
    $config = new Config();
    if (isset($_POST["update"])) {
       $config->update($_POST);
-      Html::back();
+      \GlpiPlugin\Additionalalerts\Html::back();
    } else {
-      Html::header(AdditionalAlert::getTypeName(2), '', "admin", Menu::class);
+      \GlpiPlugin\Additionalalerts\Html::header(AdditionalAlert::getTypeName(2), '', "admin", Menu::class);
       $config = new Config();
       $config->showConfigForm();
-      Html::footer();
+      \GlpiPlugin\Additionalalerts\Html::footer();
    }
 } else {
-   Html::header(__('Setup'), '', "config", "plugins");
+   \GlpiPlugin\Additionalalerts\Html::header(__('Setup'), '', "config", "plugins");
    echo "<div class='alert alert-important alert-warning d-flex'>";
    echo "<b>" . __('Please activate the plugin', 'additionalalerts') . "</b></div>";
-   Html::footer();
+   \GlpiPlugin\Additionalalerts\Html::footer();
 }

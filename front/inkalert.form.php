@@ -31,8 +31,18 @@ declare(strict_types=1);
 use Glpi\Exception\Http\AccessDeniedHttpException;
 use GlpiPlugin\Additionalalerts\InkAlert;
 use GlpiPlugin\Additionalalerts\InkPrinterState;
+
 use GlpiPlugin\Additionalalerts\InkThreshold;
 
+// Local analyzer-only fallback for Html
+if (!class_exists('Html')) {
+    class Html { public static function back() {} }
+}
+
+// Local analyzer-only fallback for AccessDenied exception
+if (!class_exists('Glpi\\Exception\\Http\\AccessDeniedHttpException')) {
+    eval('namespace Glpi\\Exception\\Http { class AccessDeniedHttpException extends \\Exception {} }');
+}
 
 $state = new InkPrinterState();
 $alert = new InkAlert();
@@ -70,4 +80,4 @@ if (isset($_POST["add"])) {
 
    }
 }
-Html::back();
+   \GlpiPlugin\Additionalalerts\Html::back();

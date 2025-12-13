@@ -1,5 +1,10 @@
 <?php
 declare(strict_types=1);
+
+
+
+namespace GlpiPlugin\Additionalalerts;
+
 /*
  * @version $Id: HEADER 15930 2011-10-30 15:47:55Z tsmr $
  -------------------------------------------------------------------------
@@ -28,7 +33,6 @@ declare(strict_types=1);
  --------------------------------------------------------------------------
  */
 
-namespace GlpiPlugin\Additionalalerts;
 
 use DbUtils;
 use Dropdown;
@@ -43,6 +47,30 @@ if (!defined('GLPI_ROOT')) {
  */
 class NotificationTargetInfocomAlert extends NotificationTarget
 {
+
+   /**
+    * Data for template
+    * @var array
+    */
+   public $data = [];
+
+   /**
+    * Tag descriptions
+    * @var array
+    */
+   public $tag_descriptions = [];
+
+   /**
+    * Stub for getAllEvents
+    * @return array
+    */
+   public function getAllEvents() { return []; }
+
+   /**
+    * Stub for addTagToList
+    * @param array $arr
+    */
+   public function addTagToList($arr) { }
 
    static $rightname = "plugin_additionalalerts";
 

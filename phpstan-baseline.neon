@@ -1,0 +1,193 @@
+parameters:
+	ignoreErrors:
+		-
+			message: '#^Call to an undefined static method Html\:\:footer\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 1
+			path: front/additionalalert.form.php
+
+		-
+			message: '#^Call to an undefined static method Html\:\:header\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 1
+			path: front/additionalalert.form.php
+
+		-
+			message: '#^Instantiated class Glpi\\Exception\\Http\\AccessDeniedHttpException not found\.$#'
+			identifier: class.notFound
+			count: 1
+			path: front/additionalalert.form.php
+
+		-
+			message: '#^Call to an undefined static method Html\:\:back\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 1
+			path: front/config.form.php
+
+		-
+			message: '#^Call to an undefined static method Html\:\:footer\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 2
+			path: front/config.form.php
+
+		-
+			message: '#^Call to an undefined static method Html\:\:header\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 2
+			path: front/config.form.php
+
+		-
+			message: '#^Call to an undefined static method Plugin\:\:isPluginActive\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 1
+			path: front/config.form.php
+
+		-
+			message: '#^Call to an undefined static method Html\:\:back\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 4
+			path: front/infocomalert.form.php
+
+		-
+			message: '#^Call to an undefined static method Html\:\:back\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 1
+			path: front/inkalert.form.php
+
+		-
+			message: '#^Instantiated class Glpi\\Exception\\Http\\AccessDeniedHttpException not found\.$#'
+			identifier: class.notFound
+			count: 1
+			path: front/inkalert.form.php
+
+		-
+			message: '#^Call to an undefined static method Html\:\:back\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 4
+			path: front/ticketunresolved.form.php
+
+		-
+			message: '#^Call to an undefined static method CronTask\:\:Register\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 3
+			path: hook.php
+
+		-
+			message: '#^Call to an undefined static method CronTask\:\:Unregister\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 1
+			path: hook.php
+
+		-
+			message: '#^Call to an undefined static method Plugin\:\:isPluginActive\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 1
+			path: hook.php
+
+		-
+			message: '#^Call to an undefined static method Plugin\:\:getPhpDir\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 1
+			path: setup.php
+
+		-
+			message: '#^Call to an undefined static method Plugin\:\:registerClass\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 5
+			path: setup.php
+
+		-
+			message: '#^Call to an undefined static method Session\:\:getLoginUserID\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 1
+			path: setup.php
+
+		-
+			message: '#^Call to an undefined static method Alert\:\:dropdownIntegerNever\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 1
+			path: src/Config.php
+
+		-
+			message: '#^Call to an undefined static method Html\:\:dropdownIntegerNever\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 1
+			path: src/Config.php
+
+		-
+			message: '#^Call to an undefined static method Html\:\:dropdownYesNo\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 2
+			path: src/Config.php
+
+		-
+			message: '#^Call to an undefined static method Html\:\:input\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 1
+			path: src/InkThreshold.php
+
+		-
+			message: '#^Call to an undefined static method CommonDBTM\:\:getForbiddenStandardMassiveAction\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 1
+			path: src/NotificationState.php
+
+		-
+			message: '#^Call to an undefined static method CommonDBTM\:\:showMassiveActionsSubForm\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 1
+			path: src/NotificationState.php
+
+		-
+			message: '#^Call to an undefined static method CommonDBTM\:\:getForbiddenStandardMassiveAction\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 1
+			path: src/NotificationType.php
+
+		-
+			message: '#^Call to an undefined static method CommonDBTM\:\:showMassiveActionsSubForm\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 1
+			path: src/NotificationType.php
+
+		-
+			message: '#^Call to an undefined static method Dropdown\:\:show\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 1
+			path: src/NotificationType.php
+
+		-
+			message: '#^Call to an undefined static method Html\:\:getCheckAllAsCheckbox\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 1
+			path: src/NotificationType.php
+
+		-
+			message: '#^Call to an undefined static method Html\:\:openMassiveActionsForm\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 1
+			path: src/NotificationType.php
+
+		-
+			message: '#^Call to an undefined static method Html\:\:showMassiveActionCheckBox\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 1
+			path: src/NotificationType.php
+
+		-
+			message: '#^Call to an undefined static method Html\:\:showMassiveActions\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 2
+			path: src/NotificationType.php
+
+		-
+			message: '#^Call to an undefined static method Alert\:\:dropdownIntegerNever\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 1
+			path: src/TicketUnresolved.php
+
+		-
+			message: '#^Call to an undefined method InkAlertTest\:\:assertIsString\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: tests/InkAlertTest.php

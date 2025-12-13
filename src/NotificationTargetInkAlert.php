@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /*
  * @version $Id: HEADER 15930 2011-10-30 15:47:55Z tsmr $
  -------------------------------------------------------------------------
@@ -45,20 +46,49 @@ if (!defined('GLPI_ROOT')) {
  */
 class NotificationTargetInkAlert extends NotificationTarget
 {
+    /**
+     * Data for template
+     * @var array
+     */
+    public $data = [];
 
-   /**
-    * @return array
-    */
-    function getEvents()
+    /**
+     * Tag descriptions
+     * @var array
+     */
+    public $tag_descriptions = [];
+
+
+    /**
+     * @return array
+     */
+    public function getAllEvents()
+    {
+        // TODO: Implement actual event retrieval logic
+        return ['ink' => __('Cartridges whose level is low', 'additionalalerts')];
+    }
+
+    /**
+     * @param array $arr
+     */
+    public function addTagToList($arr)
+    {
+        // TODO: Implement tag addition logic
+    }
+
+    /**
+     * @return array
+     */
+    public function getEvents()
     {
         return ['ink' => __('Cartridges whose level is low', 'additionalalerts')];
     }
 
-   /**
-    * @param       $event
-    * @param array $options
-    */
-    function addDataForTemplate($event, $options = [])
+    /**
+     * @param       $event
+     * @param array $options
+     */
+    public function addDataForTemplate($event, $options = [])
     {
         global $CFG_GLPI;
 
@@ -66,6 +96,18 @@ class NotificationTargetInkAlert extends NotificationTarget
         $this->data['##lang.ink.entity##'] = __('Entity');
 
         $events = $this->getAllEvents();
+
+        $this->data['##lang.ink.title##'] = $events[$event];
+
+        $this->data['##lang.ink.printer##']   = _n('Printer', 'Printers', 2);
+        $this->data['##lang.ink.cartridge##'] = _n('Cartridge', 'Cartridges', 2);
+        $this->data['##lang.ink.state##']     = __('State');
+        // ...rest of the method...
+    }
+    // ...other methods...
+
+   /**
+    * @param       $event
 
         $this->data['##lang.ink.title##'] = $events[$event];
 

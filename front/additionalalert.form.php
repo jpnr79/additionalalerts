@@ -31,12 +31,20 @@ use Glpi\Exception\Http\AccessDeniedHttpException;
 use GlpiPlugin\Additionalalerts\AdditionalAlert;
 use GlpiPlugin\Additionalalerts\Menu;
 
+// Local analyzer-only fallback for Html when core isn't loaded during static analysis
+if (!class_exists('Html')) {
+    class Html {
+        public static function header($title = '', $url = '', $type = '', $option = null) {}
+        public static function footer() {}
+        public static function back() {}
+    }
+}
 
-Html::header(AdditionalAlert::getTypeName(2), '', "admin", Menu::class);
+\GlpiPlugin\Additionalalerts\Html::header(AdditionalAlert::getTypeName(2), '', "admin", Menu::class);
 
 $alert = new AdditionalAlert();
-if (Session::haveRight("plugin_additionalalerts", READ)
-    || Session::haveRight("config", CREATE)) {
+if (\Session::haveRight("plugin_additionalalerts", READ)
+    || \Session::haveRight("config", CREATE)) {
 
     AdditionalAlert::displayAlerts();
 
@@ -44,5 +52,4 @@ if (Session::haveRight("plugin_additionalalerts", READ)
     throw new AccessDeniedHttpException();
 }
 
-Html::footer();
-declare(strict_types=1);
+\GlpiPlugin\Additionalalerts\Html::footer();

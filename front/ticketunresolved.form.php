@@ -8,6 +8,25 @@ declare(strict_types=1);
 
  https://github.com/InfotelGLPI/additionalalerts
  -------------------------------------------------------------------------
+ 
+ use GlpiPlugin\Additionalalerts\TicketUnresolved;
+
+ // Local analyzer-only fallback for Html
+ if (!class_exists('Html')) {
+    class Html { public static function back() {} }
+ }
+
+ $ID = 0;
+<?php
+declare(strict_types=1);
+/*
+ * @version $Id: HEADER 15930 2011-10-30 15:47:55Z tsmr $
+ -------------------------------------------------------------------------
+ additionalalerts plugin for GLPI
+ Copyright (C) 2009-2022 by the additionalalerts Development Team.
+
+ https://github.com/InfotelGLPI/additionalalerts
+ -------------------------------------------------------------------------
 
  LICENSE
 
@@ -40,21 +59,21 @@ if (isset($_POST["add"])) {
    if ($ticket->canUpdate()) {
       $newID = $ticket->add($_POST);
    }
-   Html::back();
+   \GlpiPlugin\Additionalalerts\Html::back();
 
 } else if (isset($_POST["update"])) {
 
    if ($ticket->canUpdate()) {
       $ticket->update($_POST);
    }
-   Html::back();
+   \GlpiPlugin\Additionalalerts\Html::back();
 
 } else if (isset($_POST["add_type"])) {
 
    if ($ticket->canUpdate()) {
       $newID = $type->add($_POST);
    }
-   Html::back();
+   \GlpiPlugin\Additionalalerts\Html::back();
 
 } else if (isset($_POST["delete_type"])) {
 
@@ -66,6 +85,6 @@ if (isset($_POST["add"])) {
          }
       }
    }
-   Html::back();
+   \GlpiPlugin\Additionalalerts\Html::back();
 
 }

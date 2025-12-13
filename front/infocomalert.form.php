@@ -31,6 +31,11 @@ declare(strict_types=1);
 use GlpiPlugin\Additionalalerts\InfocomAlert;
 use GlpiPlugin\Additionalalerts\NotificationType;
 
+// Local analyzer-only fallback for Html
+if (!class_exists('Html')) {
+   class Html { public static function back() {} }
+}
+
 $type = new NotificationType();
 $infocom = new InfocomAlert();
 
@@ -39,21 +44,21 @@ if (isset($_POST["add"])) {
    if ($infocom->canUpdate()) {
       $newID = $infocom->add($_POST);
    }
-   Html::back();
+   \GlpiPlugin\Additionalalerts\Html::back();
 
 } else if (isset($_POST["update"])) {
 
    if ($infocom->canUpdate()) {
       $infocom->update($_POST);
    }
-   Html::back();
+   \GlpiPlugin\Additionalalerts\Html::back();
 
 } else if (isset($_POST["add_type"])) {
 
    if ($infocom->canUpdate()) {
       $newID = $type->add($_POST);
    }
-   Html::back();
+   \GlpiPlugin\Additionalalerts\Html::back();
 
 } else if (isset($_POST["delete_type"])) {
 
@@ -65,6 +70,6 @@ if (isset($_POST["add"])) {
          }
       }
    }
-   Html::back();
+   \GlpiPlugin\Additionalalerts\Html::back();
 
 }

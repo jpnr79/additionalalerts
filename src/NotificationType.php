@@ -63,15 +63,15 @@ class NotificationType extends CommonDBTM {
         echo "<tr class='tab_bg_1'>";
         echo "<td>" . __('Parameter', 'additionalalerts') . "</td>";
         echo "<td>" . __('Type not used for check of buy date', 'additionalalerts');
-        Dropdown::show('ComputerType', ['name' => "types_id",
+        \GlpiPlugin\Additionalalerts\Dropdown::show('ComputerType', ['name' => "types_id",
             'used' => $used]);
         echo "&nbsp;";
-        echo Html::submit(_sx('button', 'Add'), ['name' => 'add_type', 'class' => 'btn btn-primary']);
+        echo \GlpiPlugin\Additionalalerts\Html::submit(_sx('button', 'Add'), ['name' => 'add_type', 'class' => 'btn btn-primary']);
         echo "</div></td>";
         echo "</tr>";
 
         echo "</table>";
-        Html::closeForm();
+        \GlpiPlugin\Additionalalerts\Html::closeForm();
 
         echo "</div>";
 
@@ -80,21 +80,21 @@ class NotificationType extends CommonDBTM {
         $data = $this->find([], ["types_id ASC"]);
 
         if (count($data) != 0) {
-            Html::openMassiveActionsForm('mass' . "NotificationType" . $rand);
+            \GlpiPlugin\Additionalalerts\Html::openMassiveActionsForm('mass' . "NotificationType" . $rand);
             $massiveactionparams = ['item' => __CLASS__, 'container' => 'mass' . "NotificationType" . $rand];
-            Html::showMassiveActions($massiveactionparams);
+            \GlpiPlugin\Additionalalerts\Html::showMassiveActions($massiveactionparams);
 
             echo "<div class ='center'>";
             echo "<form method='post' name='massiveaction_form$rand' id='massiveaction_form$rand'  action=\"$target\">";
             echo "<table class='tab_cadre_fixe' cellpadding='5'>";
             echo "<tr>";
-            echo "<th width='10'>" . Html::getCheckAllAsCheckbox('mass' . "NotificationType" . $rand) . "</th>";
+            echo "<th width='10'>" . \GlpiPlugin\Additionalalerts\Html::getCheckAllAsCheckbox('mass' . "NotificationType" . $rand) . "</th>";
             echo "<th>" . __('Type') . "</th>";
             echo "</tr>";
             foreach ($data as $ligne) {
                 echo "<tr class='tab_bg_1'>";
                 echo "<td width='10'>";
-                Html::showMassiveActionCheckBox(__CLASS__, $ligne["id"]);
+                \GlpiPlugin\Additionalalerts\Html::showMassiveActionCheckBox(__CLASS__, $ligne["id"]);
                 echo "</td>";
                 echo "<td>" . Dropdown::getDropdownName("glpi_computertypes", $ligne["types_id"]) . "</td>";
                 echo "</tr>";
@@ -102,11 +102,11 @@ class NotificationType extends CommonDBTM {
 
             $massiveactionparams['ontop'] = false;
 
-            echo "</table>";
-            Html::closeForm();
+                echo "</table>";
+            \GlpiPlugin\Additionalalerts\Html::closeForm();
             echo "</div>";
 
-            Html::showMassiveActions($massiveactionparams);
+            \GlpiPlugin\Additionalalerts\Html::showMassiveActions($massiveactionparams);
         }
     }
 
@@ -120,7 +120,7 @@ class NotificationType extends CommonDBTM {
     public function getForbiddenStandardMassiveAction()
     {
 
-        $forbidden = parent::getForbiddenStandardMassiveAction();
+        $forbidden = \GlpiPlugin\Additionalalerts\CommonDBTM::getForbiddenStandardMassiveAction();
         $forbidden[] = 'update';
         return $forbidden;
     }
@@ -163,7 +163,7 @@ class NotificationType extends CommonDBTM {
                 echo Html::submit(_x('button', 'Post'), ['name' => 'massiveaction', 'class' => 'btn btn-primary']);
                 return true;
         }
-        return parent::showMassiveActionsSubForm($ma);
+        return \GlpiPlugin\Additionalalerts\CommonDBTM::showMassiveActionsSubForm($ma);
     }
 
     /**

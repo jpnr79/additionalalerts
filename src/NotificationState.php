@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /*
  * @version $Id: HEADER 15930 2011-10-30 15:47:55Z tsmr $
  -------------------------------------------------------------------------
@@ -32,7 +33,6 @@ namespace GlpiPlugin\Additionalalerts;
 use CommonDBTM;
 use Dropdown;
 use Html;
-declare(strict_types=1);
 use MassiveAction;
 
 if (!defined('GLPI_ROOT')) {
@@ -58,7 +58,7 @@ class NotificationState extends CommonDBTM
     public function getForbiddenStandardMassiveAction()
     {
 
-        $forbidden = parent::getForbiddenStandardMassiveAction();
+        $forbidden = \GlpiPlugin\Additionalalerts\CommonDBTM::getForbiddenStandardMassiveAction();
         $forbidden[] = 'update';
         return $forbidden;
     }
@@ -96,10 +96,10 @@ class NotificationState extends CommonDBTM
 
         switch ($ma->getAction()) {
             case 'purge':
-                echo Html::submit(_x('button', 'Post'), ['name' => 'massiveaction', 'class' => 'btn btn-primary']);
+                echo \GlpiPlugin\Additionalalerts\Html::submit(_x('button', 'Post'), ['name' => 'massiveaction', 'class' => 'btn btn-primary']);
                 return true;
         }
-        return parent::showMassiveActionsSubForm($ma);
+        return \GlpiPlugin\Additionalalerts\CommonDBTM::showMassiveActionsSubForm($ma);
     }
 
    /**

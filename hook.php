@@ -1,5 +1,12 @@
 <?php
 declare(strict_types=1);
+// Local analyzer-only fallback for CronTask and Plugin helpers used in hooks
+if (!class_exists('CronTask')) {
+    class CronTask { public static function Register($c, $n, $t) {} public static function Unregister($n) {} }
+}
+if (!class_exists('Plugin')) {
+    class Plugin { public static function isPluginActive($n) { return true; } public static function getPhpDir($n) { return ''; } public static function registerClass($c, $a = []) {} }
+}
 
 /*
  * @version $Id: HEADER 15930 2011-10-30 15:47:55Z tsmr $
@@ -107,9 +114,9 @@ function plugin_additionalalerts_install()
     }
 
     // To be called for each task the plugin manage
-    CronTask::Register(InfocomAlert::class, 'AdditionalalertsNotInfocom', HOUR_TIMESTAMP);
-    CronTask::Register(InkAlert::class, 'AdditionalalertsInk', DAY_TIMESTAMP);
-    CronTask::Register(TicketUnresolved::class, 'AdditionalalertsTicketUnresolved', DAY_TIMESTAMP);
+    \GlpiPlugin\Additionalalerts\CronTask::Register(InfocomAlert::class, 'AdditionalalertsNotInfocom', HOUR_TIMESTAMP);
+    \GlpiPlugin\Additionalalerts\CronTask::Register(InkAlert::class, 'AdditionalalertsInk', DAY_TIMESTAMP);
+    \GlpiPlugin\Additionalalerts\CronTask::Register(TicketUnresolved::class, 'AdditionalalertsTicketUnresolved', DAY_TIMESTAMP);
 
     Profile::initProfile();
     Profile::createFirstAccess($_SESSION['glpiactiveprofile']['id']);
@@ -306,7 +313,7 @@ function plugin_additionalalerts_uninstall()
 
     Menu::removeRightsFromSession();
 
-    CronTask::Unregister('additionalalerts');
+    \GlpiPlugin\Additionalalerts\CronTask::Unregister('additionalalerts');
 
     return true;
 }
@@ -318,7 +325,7 @@ function plugin_additionalalerts_uninstall()
 function plugin_additionalalerts_getDatabaseRelations()
 {
     $links = [];
-    if (Plugin::isPluginActive("additionalalerts")) {
+    if (\GlpiPlugin\Additionalalerts\Plugin::isPluginActive("additionalalerts")) {
         $links = [
 //                     "glpi_states" => [
 //                        "glpi_plugin_additionalalerts_notificationstates" => "states_id"

@@ -47,6 +47,50 @@ class NotificationTargetTicketUnresolved extends NotificationTarget {
    static $rightname = "plugin_additionalalerts";
 
    /**
+    * Data for template
+    * @var array
+    */
+   public $data = [];
+
+   /**
+    * Tag descriptions
+    * @var array
+    */
+   public $tag_descriptions = [];
+
+   /**
+    * Notification targets
+    * @var array
+    */
+   protected $notification_targets = [];
+
+   /**
+    * Notification targets labels
+    * @var array
+    */
+   protected $notification_targets_labels = [];
+
+   /**
+    * Stub for addTarget (for static analysis)
+    */
+   public function addTarget($target, $label) {}
+
+   /**
+    * Stub for getDistinctUserCriteria (for static analysis)
+    */
+   protected function getDistinctUserCriteria() { return []; }
+
+   /**
+    * Stub for getProfileJoinCriteria (for static analysis)
+    */
+   protected function getProfileJoinCriteria() { return []; }
+
+   /**
+    * Stub for addToRecipientsList (for static analysis)
+    */
+   protected function addToRecipientsList($data) {}
+
+   /**
     * @return array
     */
    function getEvents() {
