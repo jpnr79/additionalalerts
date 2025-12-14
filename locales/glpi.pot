@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: GLPI - Additionalalerts plugin\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-12 11:42+0000\n"
+"POT-Creation-Date: 2025-12-14 15:11+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,69 +18,71 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
 
-#: setup.php:97 src/AdditionalAlert.php:117 src/Menu.php:45 src/Profile.php:117
+#: setup.php:101 src/AdditionalAlert.php:117 src/Menu.php:45
+#: src/Profile.php:136
 msgid "Other alert"
 msgid_plural "Others alerts"
 msgstr[0] ""
 msgstr[1] ""
 
-#: front/config.form.php:67
+#: front/config.form.php:66
 msgid "Please activate the plugin"
 msgstr ""
 
-#: src/AdditionalAlert.php:179
+#: src/AdditionalAlert.php:187
 msgid "No used alerts"
 msgstr ""
 
-#: src/AdditionalAlert.php:208
+#: src/AdditionalAlert.php:216
 msgid "No computers with no buy date"
 msgstr ""
 
-#: src/AdditionalAlert.php:226 src/Config.php:174 src/InkAlert.php:65
-#: src/InkAlert.php:122 src/InkAlert.php:302 src/InkAlert.php:373
-#: src/NotificationTargetInkAlert.php:54 src/NotificationTargetInkAlert.php:124
+#: src/AdditionalAlert.php:234 src/Config.php:168 src/InkAlert.php:73
+#: src/InkAlert.php:137 src/InkAlert.php:358 src/InkAlert.php:431
+#: src/NotificationTargetInkAlert.php:68 src/NotificationTargetInkAlert.php:84
+#: src/NotificationTargetInkAlert.php:166
 msgid "Cartridges whose level is low"
 msgstr ""
 
-#: src/AdditionalAlert.php:233
+#: src/AdditionalAlert.php:241
 msgid "Ink level"
 msgstr ""
 
-#: src/AdditionalAlert.php:240
+#: src/AdditionalAlert.php:248
 msgid "No cartridge is below the threshold"
 msgstr ""
 
-#: src/AdditionalAlert.php:256
+#: src/AdditionalAlert.php:264
 msgid "Tickets unresolved since more"
 msgstr ""
 
-#: src/AdditionalAlert.php:272
+#: src/AdditionalAlert.php:280
 msgid "No tickets unresolved since more"
 msgstr ""
 
-#: src/Config.php:90 src/InkAlert.php:83
+#: src/Config.php:75 src/InkAlert.php:91
 msgid "Plugin setup"
 msgstr ""
 
-#: src/Config.php:186
+#: src/Config.php:185
 msgid "Unresolved Ticket Alerts"
 msgstr ""
 
-#: src/Config.php:193 src/Config.php:196
+#: src/Config.php:194
 msgid "Day"
 msgid_plural "Days"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/InkPrinterState.php:98 src/NotificationType.php:64
+#: src/InkPrinterState.php:56 src/NotificationType.php:64
 msgid "Parameter"
 msgstr ""
 
-#: src/InkPrinterState.php:99
+#: src/InkPrinterState.php:57
 msgid "Statutes used for the ink level"
 msgstr ""
 
-#: src/InkThreshold.php:70
+#: src/InkThreshold.php:72
 msgid "Ink level alerts"
 msgstr ""
 
