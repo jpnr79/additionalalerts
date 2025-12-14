@@ -226,15 +226,15 @@ class Profile extends GLPIProfile
         foreach ($it as $prof) {
             self::migrateOneProfile($prof['id']);
         }
-        $it = $DB->request([
-            'FROM' => 'glpi_profilerights',
-            'WHERE' => [
-                'profiles_id' => $_SESSION['glpiactiveprofile']['id'],
-                'name' => ['LIKE', '%plugin_additionalalerts%'],
-            ],
-        ]);
-        foreach ($it as $prof) {
-            if (isset($_SESSION['glpiactiveprofile'])) {
+        if (isset($_SESSION['glpiactiveprofile'])) {
+            $it = $DB->request([
+                'FROM' => 'glpi_profilerights',
+                'WHERE' => [
+                    'profiles_id' => $_SESSION['glpiactiveprofile']['id'],
+                    'name' => ['LIKE', '%plugin_additionalalerts%'],
+                ],
+            ]);
+            foreach ($it as $prof) {
                 $_SESSION['glpiactiveprofile'][$prof['name']] = $prof['rights'];
             }
         }

@@ -167,35 +167,62 @@ class InfocomAlert extends CommonDBTM {
     {
         global $DB;
 
-        $query       = "SELECT `glpi_computers`.*, `glpi_items_operatingsystems`.`operatingsystems_id`
-                     FROM `glpi_computers`
-                     LEFT JOIN `glpi_infocoms` ON (`glpi_computers`.`id` = `glpi_infocoms`.`items_id` AND `glpi_infocoms`.`itemtype` = 'Computer')
-                     LEFT JOIN `glpi_items_operatingsystems` ON (`glpi_computers`.`id` = `glpi_items_operatingsystems`.`items_id`
-                               AND `glpi_items_operatingsystems`.`itemtype` = 'Computer')
-                     WHERE `glpi_computers`.`is_deleted` = 0
-                     AND `glpi_computers`.`is_template` = 0
-                     AND `glpi_infocoms`.`buy_date` IS NULL ";
-
         $criteria = [
+            'SELECT' => [
+                'glpi_computers.*',
+                'glpi_items_operatingsystems.operatingsystems_id'
+            ],
+            'FROM' => 'glpi_computers',
+            'LEFT JOIN' => [
+                'glpi_infocoms' => [
+                    'ON' => [
+                        'glpi_computers' => 'id',
+                        'glpi_infocoms' => 'items_id',
+                        [
+                            'AND' => [
+                                'glpi_infocoms.itemtype' => 'Computer'
+                            ]
+                        ]
+                    ]
+                ],
+                'glpi_items_operatingsystems' => [
+                    'ON' => [
+                        'glpi_computers' => 'id',
+                        'glpi_items_operatingsystems' => 'items_id',
+                        [
+                            'AND' => [
+                                'glpi_items_operatingsystems.itemtype' => 'Computer'
+                            ]
+                        ]
+                    ]
+                ]
+            ],
+            'WHERE' => [
+                'glpi_computers.is_deleted' => 0,
+                'glpi_computers.is_template' => 0,
+                'glpi_infocoms.buy_date' => null,
+                'glpi_computers.entities_id' => $entity
+            ],
+            'ORDER' => 'glpi_computers.name ASC'
+        ];
+
+        // Check for notification types to exclude
+        $types_criteria = [
             'SELECT' => 'types_id',
             'FROM' => 'glpi_plugin_additionalalerts_notificationtypes',
         ];
 
-        $iterator = $DB->request($criteria);
+        $iterator = $DB->request($types_criteria);
 
         if (count($iterator) > 0) {
-            $query .= " AND (`glpi_computers`.`computertypes_id` != 0 ";
+            $excluded_types = [];
             foreach ($iterator as $data_type) {
-                $type_where = "AND `glpi_computers`.`computertypes_id` != '" . $data_type["types_id"] . "' ";
-                $query      .= " $type_where ";
+                $excluded_types[] = $data_type["types_id"];
             }
-            $query .= ") ";
+            $criteria['WHERE']['glpi_computers.computertypes_id'] = ['NOT IN', $excluded_types];
         }
-        $query .= "AND `glpi_computers`.`entities_id`= '" . $entity . "' ";
 
-        $query .= " ORDER BY `glpi_computers`.`name` ASC";
-
-        return $query;
+        return $criteria;
     }
 
 

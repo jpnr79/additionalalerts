@@ -44,7 +44,7 @@ define('PLUGIN_ADDITIONALALERTS_VERSION', '3.0.3');
 global $CFG_GLPI;
 
 if (!defined("PLUGIN_ADDITIONALALERTS_DIR")) {
-    define("PLUGIN_ADDITIONALALERTS_DIR", \GlpiPlugin\Additionalalerts\Plugin::getPhpDir("additionalalerts"));
+    define("PLUGIN_ADDITIONALALERTS_DIR", \Plugin::getPhpDir("additionalalerts"));
     $root = $CFG_GLPI['root_doc'] . '/plugins/additionalalerts';
     define("PLUGIN_ADDITIONALALERTS_WEBDIR", $root);
 }
@@ -57,33 +57,33 @@ function plugin_init_additionalalerts()
     $PLUGIN_HOOKS['csrf_compliant']['additionalalerts'] = true;
     $PLUGIN_HOOKS['change_profile']['additionalalerts'] = [Profile::class, 'initProfile'];
 
-    \GlpiPlugin\Additionalalerts\Plugin::registerClass(InfocomAlert::class, [
+    \Plugin::registerClass(InfocomAlert::class, [
       'notificationtemplates_types' => true,
       'addtabon'                    => 'CronTask'
     ]);
 
-    \GlpiPlugin\Additionalalerts\Plugin::registerClass(TicketUnresolved::class, [
+    \Plugin::registerClass(TicketUnresolved::class, [
       'notificationtemplates_types' => true
     ]);
 
-    \GlpiPlugin\Additionalalerts\Plugin::registerClass(InkAlert::class, [
+    \Plugin::registerClass(InkAlert::class, [
       'notificationtemplates_types' => true,
       'addtabon'                    => ['Printer', 'CronTask']
     ]);
 
-    \GlpiPlugin\Additionalalerts\Plugin::registerClass(
+    \Plugin::registerClass(
         Profile::class,
         ['addtabon' => 'Profile']
     );
 
-    \GlpiPlugin\Additionalalerts\Plugin::registerClass(
+    \Plugin::registerClass(
         Config::class,
         ['addtabon' => ['NotificationMailingSetting', 'Entity']]
     );
 
-    if (\GlpiPlugin\Additionalalerts\Session::getLoginUserID()) {
+    if (\Session::getLoginUserID()) {
        // Display a menu entry ?
-      if (\GlpiPlugin\Additionalalerts\Session::haveRight("plugin_additionalalerts", READ)) {
+      if (\Session::haveRight("plugin_additionalalerts", READ)) {
             $PLUGIN_HOOKS['config_page']['additionalalerts']           = 'front/config.form.php';
             $PLUGIN_HOOKS["menu_toadd"]['additionalalerts']['admin'] = Menu::class;
         }

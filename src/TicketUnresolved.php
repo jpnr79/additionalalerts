@@ -97,19 +97,41 @@ class TicketUnresolved extends CommonDBTM
         $date = date("Y-m-d", $delay_stamp);
         $date = $date . " 00:00:00";
 
-        $query = "SELECT `glpi_tickets`.*,`glpi_tickets_users`.users_id, `glpi_groups_users`.`users_id` as supervisor
-         FROM `glpi_tickets`
-         LEFT JOIN `glpi_tickets_users` ON `glpi_tickets`.`id` = `glpi_tickets_users`.`tickets_id`
-          AND `glpi_tickets_users`.`type` = 2
-         LEFT JOIN `glpi_groups_tickets` ON `glpi_tickets`.`id` = `glpi_groups_tickets`.`tickets_id`
-          AND `glpi_groups_tickets`.`type` = 2
-         LEFT JOIN `glpi_groups_users` ON `glpi_groups_users`.`groups_id` = `glpi_groups_tickets`.`groups_id`
-          AND `glpi_groups_users`.`is_manager` = 1
-         WHERE `glpi_tickets`.`date` <= '" . $date . "'
-         AND `glpi_tickets`.`status` <= 4
-         AND `glpi_tickets`.`is_deleted` = 0
-         AND `glpi_tickets`.`entities_id` = '" . $entity . "'
-         ORDER BY `glpi_tickets`.`id`";
+        $query = [
+            'SELECT' => [
+                'glpi_tickets.*',
+                'glpi_tickets_users.users_id',
+                'supervisor' => 'glpi_groups_users.users_id'
+            ],
+            'FROM' => 'glpi_tickets',
+            'LEFT JOIN' => [
+                'glpi_tickets_users' => [
+                    'ON' => [
+                        'glpi_tickets.id' => 'glpi_tickets_users.tickets_id',
+                        'AND' => ['glpi_tickets_users.type' => 2]
+                    ]
+                ],
+                'glpi_groups_tickets' => [
+                    'ON' => [
+                        'glpi_tickets.id' => 'glpi_groups_tickets.tickets_id',
+                        'AND' => ['glpi_groups_tickets.type' => 2]
+                    ]
+                ],
+                'glpi_groups_users' => [
+                    'ON' => [
+                        'glpi_groups_users.groups_id' => 'glpi_groups_tickets.groups_id',
+                        'AND' => ['glpi_groups_users.is_manager' => 1]
+                    ]
+                ]
+            ],
+            'WHERE' => [
+                ['<=', 'glpi_tickets.date', $date],
+                ['<=', 'glpi_tickets.status', 4],
+                'glpi_tickets.is_deleted' => 0,
+                'glpi_tickets.entities_id' => $entity
+            ],
+            'ORDER' => 'glpi_tickets.id'
+        ];
 
         return $query;
     }

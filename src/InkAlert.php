@@ -150,20 +150,58 @@ class InkAlert extends CommonDBTM {
     */
     static function query($entities)
     {
+        global $DB;
 
-        $query = "SELECT glpi_printers_cartridgeinfos.id, glpi_printers_cartridgeinfos.property, glpi_printers.entities_id
-                  FROM glpi_printers_cartridgeinfos,
-                       glpi_plugin_additionalalerts_inkthresholds,
-                       glpi_printers
-                  WHERE glpi_printers_cartridgeinfos.printers_id = glpi_printers.id
-                    AND glpi_printers_cartridgeinfos.property LIKE 'toner%'
-                    AND glpi_printers_cartridgeinfos.value <= glpi_plugin_additionalalerts_inkthresholds.threshold
-                    AND glpi_printers.entities_id IN ($entities)
-                    AND glpi_printers.states_id IN (SELECT states_id FROM glpi_plugin_additionalalerts_inkprinterstates)
-                  ORDER BY glpi_printers.name";
+        // Get the threshold value
+        $threshold_criteria = [
+            'SELECT' => 'threshold',
+            'FROM' => 'glpi_plugin_additionalalerts_inkthresholds',
+            'ORDER' => 'id DESC',
+            'LIMIT' => 1
+        ];
+        $threshold_iterator = $DB->request($threshold_criteria);
+        $threshold = 0;
+        foreach ($threshold_iterator as $thresh) {
+            $threshold = $thresh['threshold'];
+            break;
+        }
 
+        // Get the states from the ink printer states table
+        $states_criteria = [
+            'SELECT' => 'states_id',
+            'FROM' => 'glpi_plugin_additionalalerts_inkprinterstates',
+        ];
+        $states_iterator = $DB->request($states_criteria);
+        $states_ids = [];
+        foreach ($states_iterator as $state) {
+            $states_ids[] = $state['states_id'];
+        }
 
-        return $query;
+        $criteria = [
+            'SELECT' => [
+                'glpi_printers_cartridgeinfos.id',
+                'glpi_printers_cartridgeinfos.property',
+                'glpi_printers.entities_id'
+            ],
+            'FROM' => 'glpi_printers_cartridgeinfos',
+            'INNER JOIN' => [
+                'glpi_printers' => [
+                    'ON' => [
+                        'glpi_printers_cartridgeinfos' => 'printers_id',
+                        'glpi_printers' => 'id'
+                    ]
+                ]
+            ],
+            'WHERE' => [
+                'glpi_printers_cartridgeinfos.property' => ['LIKE', 'toner%'],
+                'glpi_printers_cartridgeinfos.value' => ['<=', $threshold],
+                'glpi_printers.entities_id' => $entities,
+                'glpi_printers.states_id' => $states_ids
+            ],
+            'ORDER' => 'glpi_printers.name'
+        ];
+
+        return $criteria;
     }
 
 

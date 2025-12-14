@@ -189,7 +189,7 @@ class AdditionalAlert extends CommonDBTM
         if ($additionalalerts_not_infocom != 0) {
             if (Session::haveRight("infocom", READ)) {
                 $query  = InfocomAlert::query($_SESSION["glpiactive_entity"]);
-                $result = $DB->doQuery($query);
+                $result = $DB->query($query);
 
                 if ($DB->numrows($result) > 0) {
                     if (Session::isMultiEntitiesMode()) {
@@ -222,7 +222,7 @@ class AdditionalAlert extends CommonDBTM
         if ($additionalalerts_ink != 0) {
             if (Session::haveRight("cartridge", READ)) {
                 $query  = InkAlert::query($_SESSION["glpiactive_entity"]);
-                $result = $DB->doQuery($query);
+                $result = $DB->query($query);
 
                 if ($DB->numrows($result) > 0) {
                     if (Session::isMultiEntitiesMode()) {
@@ -255,7 +255,7 @@ class AdditionalAlert extends CommonDBTM
 
             foreach ($entities as $entity => $delay_ticket_alert) {
                 $query  = TicketUnresolved::query($delay_ticket_alert, $entity);
-                $result = $DB->doQuery($query);
+                $result = $DB->query($query);
                 $nbcol  = 7;
 
 

@@ -104,22 +104,24 @@ function plugin_additionalalerts_install()
                 $query = "UPDATE `glpi_plugin_additionalalerts_profiles`
                   SET `profiles_id` = '" . $data["id"] . "'
                   WHERE `id` = '" . $data["id"] . "';";
-                $DB->doQuery($query);
+                $DB->query($query);
             }
         }
 
         $query = "ALTER TABLE `glpi_plugin_additionalalerts_profiles`
                DROP `name` ;";
-        $DB->doQuery($query);
+        $DB->query($query);
     }
 
     // To be called for each task the plugin manage
-    \GlpiPlugin\Additionalalerts\CronTask::Register(InfocomAlert::class, 'AdditionalalertsNotInfocom', HOUR_TIMESTAMP);
-    \GlpiPlugin\Additionalalerts\CronTask::Register(InkAlert::class, 'AdditionalalertsInk', DAY_TIMESTAMP);
-    \GlpiPlugin\Additionalalerts\CronTask::Register(TicketUnresolved::class, 'AdditionalalertsTicketUnresolved', DAY_TIMESTAMP);
+    CronTask::register(InfocomAlert::class, 'AdditionalalertsNotInfocom', HOUR_TIMESTAMP);
+    CronTask::register(InkAlert::class, 'AdditionalalertsInk', DAY_TIMESTAMP);
+    CronTask::register(TicketUnresolved::class, 'AdditionalalertsTicketUnresolved', DAY_TIMESTAMP);
 
     Profile::initProfile();
-    Profile::createFirstAccess($_SESSION['glpiactiveprofile']['id']);
+    if (isset($_SESSION['glpiactiveprofile'])) {
+        Profile::createFirstAccess($_SESSION['glpiactiveprofile']['id']);
+    }
 
     return true;
 }
