@@ -384,6 +384,11 @@ class InkAlert extends CommonDBTM {
                         ) . ":  $message");
                     }
                 } else {
+                    $error_message = sprintf(
+                        '[%s:%s] entity=%s: Send ink alert failed, user=%s',
+                        __FILE__, __FUNCTION__, $entity, $_SESSION['glpiname'] ?? 'unknown'
+                    );
+                    Toolbox::logInFile('additionalalerts', $error_message);
                     if ($task) {
                         $task->log(Dropdown::getDropdownName("glpi_entities", $entity) .
                              ":  Send ink alert failed\n");
