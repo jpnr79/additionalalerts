@@ -305,55 +305,7 @@ function plugin_additionalalerts_getDatabaseRelations()
     global $DB;
     $links = [];
     if (\GlpiPlugin\Additionalalerts\Plugin::isPluginActive("additionalalerts")) {
-        
-    if ($template_id) {
-
-        
-
-        if (!function_exists('getDB')) {
-            function getDB() {
-                global $DB;
-                if (isset($DB) && is_object($DB)) {
-                    return $DB;
-                } elseif (class_exists('DBConnection') && method_exists('DBConnection', 'getDB')) {
-                    return DBConnection::getDB();
-                } else {
-                    throw new \RuntimeException('No GLPI DB object available');
-                }
-            }
-        }
-        // Local analyzer-only fallback for CronTask and Plugin helpers used in hooks
-        if (!class_exists('CronTask')) {
-            class CronTask { public static function Register($c, $n, $t) {} public static function Unregister($n) {} }
-        }
-
-        if (!class_exists('Plugin')) {
-            class Plugin {
-                public static function isPluginActive($n) { return true; }
-                public static function getPhpDir($n) { return ''; }
-                public static function registerClass($c, $a = []) {}
-            }
-        }
-
-    // Alert Ticket Unresolved
-    $itemtype = 'GlpiPlugin\\Additionalalerts\\TicketUnresolved';
-    $sql = "INSERT INTO glpi_notificationtemplates (itemtype, name) VALUES ('{$itemtype}', 'Alert Ticket Unresolved')";
-    getDB()->query($sql);
-    $template_id = getDB()->insert_id ? getDB()->insert_id : null;
-    if ($template_id) {
-        $subject = '##ticket.action## ##ticket.entity##';
-        $content_text = '##ticket.action## ##ticket.entity##\n         ##FOREACHtickets##\n\n          ##lang.ticket.title## : ##ticket.title##\n           ##lang.ticket.status## : ##ticket.status##\n\n           ##ticket.url##\n           ##ENDFOREACHtickets##';
-        $content_html = '&lt;table class=\"tab_cadre\" border=\"1\" cellspacing=\"2\" cellpadding=\"3\"&gt;\n    &lt;tbody&gt;\n    &lt;tr&gt;\n    &lt;td style=\"text-align: left;\" width=\"auto\" bgcolor=\"#95bde4\"&gt;&lt;span style=\"font-family: Verdana; font-size: 11px; text-align: left;\"&gt;##lang.ticket.authors##&lt;/span&gt;&lt;/td&gt;\n    &lt;td style=\"text-align: left;\" width=\"auto\" bgcolor=\"#95bde4\"&gt;&lt;span style=\"font-family: Verdana; font-size: 11px; text-align: left;\"&gt;##lang.ticket.title##&lt;/span&gt;&lt;/td&gt;';
-        $sql = "INSERT INTO glpi_notificationtemplatetranslations (notificationtemplates_id, subject, content_text, content_html) VALUES ({$template_id}, '" . addslashes($subject) . "', '" . addslashes($content_text) . "', '" . addslashes($content_html) . "')";
-        getDB()->query($sql);
-        $sql = "INSERT INTO glpi_notifications (name, entities_id, itemtype, event, is_recursive) VALUES ('Alert Ticket Unresolved', 0, '{$itemtype}', 'ticketunresolved', 1)";
-        getDB()->query($sql);
-        $notification_id = getDB()->insert_id ? getDB()->insert_id : null;
-        if ($notification_id) {
-            $sql = "INSERT INTO glpi_notifications_notificationtemplates (notifications_id, mode, notificationtemplates_id) VALUES ({$notification_id}, 'mailing', {$template_id})";
-            getDB()->query($sql);
-        }
+        // Add any relations if needed
     }
-    $migration->executeMigration();
-    return true;
+    return $links;
 }
