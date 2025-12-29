@@ -1,6 +1,6 @@
 
 <?php
-declare(strict_types=1);
+
 
 use Toolbox;
 
@@ -15,127 +15,31 @@ if (!function_exists('getDB')) {
             throw new \RuntimeException('No GLPI DB object available');
         }
     }
-}
 // Local analyzer-only fallback for CronTask and Plugin helpers used in hooks
 if (!class_exists('CronTask')) {
     class CronTask { public static function Register($c, $n, $t) {} public static function Unregister($n) {} }
-}
 if (!class_exists('Plugin')) {
     class Plugin { public static function isPluginActive($n) { return true; } public static function getPhpDir($n) { return ''; } public static function registerClass($c, $a = []) {} }
-}
-
 /*
  * @version $Id: HEADER 15930 2011-10-30 15:47:55Z tsmr $
- -------------------------------------------------------------------------
- additionalalerts plugin for GLPI
- Copyright (C) 2009-2022 by the additionalalerts Development Team.
-
- https://github.com/InfotelGLPI/additionalalerts
- -------------------------------------------------------------------------
-
- LICENSE
-
- This file is part of additionalalerts.
-
- additionalalerts is free software; you can redistribute it and/or modify
- it under the terms of the GNU General Public License as published by
- the Free Software Foundation; either version 2 of the License, or
- (at your option) any later version.
-
- additionalalerts is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with additionalalerts. If not, see <http://www.gnu.org/licenses/>.
- --------------------------------------------------------------------------
+ * -------------------------------------------------------------------------
+ * additionalalerts plugin for GLPI
+ * Copyright (C) 2009-2022 by the additionalalerts Development Team.
+ *
+ * additionalalerts is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * additionalalerts is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with additionalalerts. If not, see <http://www.gnu.org/licenses/>.
+ * --------------------------------------------------------------------------
  */
-
-use GlpiPlugin\Additionalalerts\InfocomAlert;
-use GlpiPlugin\Additionalalerts\InkAlert;
-use GlpiPlugin\Additionalalerts\Menu;
-use GlpiPlugin\Additionalalerts\Profile;
-use GlpiPlugin\Additionalalerts\TicketUnresolved;
-
-/**
- * @return bool
- */
-function plugin_additionalalerts_install()
-{
-    // use getDB() for DB access
-
-    $update78 = false;
-
-    //INSTALL
-    if (!getDB()->tableExists("glpi_plugin_additionalalerts_ticketunresolveds")
-        && !getDB()->tableExists("glpi_plugin_additionalalerts_configs")) {
-        $install = true;
-        $sql = file_get_contents(PLUGIN_ADDITIONALALERTS_DIR . "/sql/empty-3.0.0.sql");
-        foreach (explode(';', $sql) as $query) {
-            if (trim($query)) {
-                getDB()->query($query);
-            }
-        }
-        install_notifications_additionalalerts();
-    }
-
-    if (getDB()->tableExists("glpi_plugin_alerting_profiles")
-        && getDB()->fieldExists("glpi_plugin_alerting_profiles", "interface")) {
-        $update78 = true;
-        $sql = file_get_contents(PLUGIN_ADDITIONALALERTS_DIR . "/sql/update-1.2.0.sql");
-        foreach (explode(';', $sql) as $query) {
-            if (trim($query)) {
-                getDB()->query($query);
-            }
-        }
-        $sql = file_get_contents(PLUGIN_ADDITIONALALERTS_DIR . "/sql/update-1.3.0.sql");
-        foreach (explode(';', $sql) as $query) {
-            if (trim($query)) {
-                getDB()->query($query);
-            }
-        }
-    }
-
-    if (!getDB()->tableExists("glpi_plugin_additionalalerts_infocomalerts")) {
-        $update78 = true;
-        if (method_exists('Toolbox', 'runSQLFile')) {
-            $sql = file_get_contents(PLUGIN_ADDITIONALALERTS_DIR . "/sql/update-1.3.0.sql");
-            foreach (explode(';', $sql) as $query) {
-                if (trim($query)) {
-                    getDB()->query($query);
-                }
-            }
-        } else {
-            $sql = file_get_contents(PLUGIN_ADDITIONALALERTS_DIR . "/sql/update-1.3.0.sql");
-            foreach (explode(';', $sql) as $query) {
-                if (trim($query)) {
-                    getDB()->query($query);
-                }
-            }
-        }
-    }
-
-    if (!getDB()->tableExists("glpi_plugin_additionalalerts_inkalerts")) {
-        $sql = file_get_contents(PLUGIN_ADDITIONALALERTS_DIR . "/sql/update-1.7.1.sql");
-        foreach (explode(';', $sql) as $query) {
-            if (trim($query)) {
-                getDB()->query($query);
-            }
-        }
-    }
-
-    //version 1.8.0
-    if (!getDB()->tableExists("glpi_plugin_additionalalerts_ticketunresolveds")) {
-        $update90 = true;
-        $sql = file_get_contents(PLUGIN_ADDITIONALALERTS_DIR . "/sql/update-1.8.0.sql");
-        foreach (explode(';', $sql) as $query) {
-            if (trim($query)) {
-                getDB()->query($query);
-            }
-        }
-    }
-
     // version 3.0.0
     if (getDB()->tableExists("glpi_plugin_additionalalerts_inkthresholds")
         && getDB()->fieldExists("glpi_plugin_additionalalerts_inkthresholds", "cartridges_id")) {
@@ -194,7 +98,6 @@ function plugin_additionalalerts_install()
     }
 
     return true;
-}
 
 /**
  * @return bool
@@ -392,7 +295,6 @@ function plugin_additionalalerts_uninstall()
     \CronTask::Unregister('additionalalerts');
 
     return true;
-}
 
 // Define database relations
 /**
@@ -403,50 +305,35 @@ function plugin_additionalalerts_getDatabaseRelations()
     global $DB;
     $links = [];
     if (\GlpiPlugin\Additionalalerts\Plugin::isPluginActive("additionalalerts")) {
-        $links = [
-//                     "glpi_states" => [
-//                        "glpi_plugin_additionalalerts_notificationstates" => "states_id"
-//                     ],
-//                     "glpi_computertypes" => [
-//                        "glpi_plugin_additionalalerts_notificationtypes" => "types_id"
-//                     ],
-//                    "glpi_printers" => [
-//                        "glpi_plugin_additionalalerts_inkthresholds" => "printers_id"]
-        ];
-    }
-
-
-    return $links;
-}
-
-function install_notifications_additionalalerts()
-{
-
-    global $DB;
-
-    $migration = new Migration(1.0);
-
-    // Notification
-    // Request
-    // Alert ink level
-    $itemtype = 'GlpiPlugin\\Additionalalerts\\InkAlert';
-    $sql = "INSERT INTO glpi_notificationtemplates (itemtype, name) VALUES ('{$itemtype}', 'Alert ink level')";
-    getDB()->query($sql);
-    $template_id = getDB()->insert_id ? getDB()->insert_id : null;
+        
     if ($template_id) {
-        $subject = '##lang.ink.title## : ##ink.entity##';
-        $content_text = '##lang.ink.title## :\n          ##FOREACHinks##\n          - ##ink.printer## - ##ink.cartridge## - ##ink.state##%\n          ##ENDFOREACHinks##';
-        $content_html = '&lt;table class=\"tab_cadre\" border=\"1\" cellspacing=\"2\" cellpadding=\"3\"&gt;\n          &lt;tbody&gt;\n          &lt;tr&gt;\n          &lt;td style=\"text-align: left;\" bgcolor=\"#cccccc\"&gt;&lt;span style=\"font-family: Verdana; font-size: 11px; text-align: left;\"&gt;##lang.ink.printer##&lt;/span&gt;&lt;/td&gt;\n          &lt;td style=\"text-align: left;\" bgcolor=\"#cccccc\"&gt;&lt;span style=\"font-family: Verdana; font-size: 11px; text-align: left;\"&gt;##lang.ink.cartridge##&lt;/span&gt;&lt;/td&gt;\n          &lt;td style=\"text-align: left;\" bgcolor=\"#cccccc\"&gt;&lt;span style=\"font-family: Verdana; font-size: 11px; text-align: left;\"&gt;##ink.state##%&lt;/span&gt;&lt;/td&gt;\n          &lt;/tr&gt;\n          ##FOREACHinks##\n          &lt;tr&gt;\n          &lt;td&gt;&lt;a href=\"##ink.urlprinter##\"&gt;&lt;span style=\"font-family: Verdana; font-size: 11px; text-align: left;\"&gt;##ink.printer##&lt;/span&gt;&lt;/a&gt;&lt;/td&gt;\n          &lt;td&gt;&lt;a href=\"##ink.urlcartridge##\"&gt;&lt;span style=\"font-family: Verdana; font-size: 11px; text-align: left;\"&gt;##ink.cartridge##&lt;/span&gt;&lt;/a&gt;&lt;/td&gt;\n          &lt;td&gt;&lt;span style=\"font-family: Verdana; font-size: 11px; text-align: left;\"&gt;##ink.state##%&lt;/span&gt;&lt;/td&gt;\n          &lt;/tr&gt;\n          ##ENDFOREACHinks##\n          &lt;/tbody&gt;\n          &lt;/table&gt;';
-        $sql = "INSERT INTO glpi_notificationtemplatetranslations (notificationtemplates_id, subject, content_text, content_html) VALUES ({$template_id}, '" . addslashes($subject) . "', '" . addslashes($content_text) . "', '" . addslashes($content_html) . "')";
-        getDB()->query($sql);
-        $sql = "INSERT INTO glpi_notifications (name, entities_id, itemtype, event, is_recursive) VALUES ('Alert ink level', 0, '{$itemtype}', 'ink', 1)";
-        getDB()->query($sql);
-        $notification_id = getDB()->insert_id ? getDB()->insert_id : null;
-        if ($notification_id) {
-            $sql = "INSERT INTO glpi_notifications_notificationtemplates (notifications_id, mode, notificationtemplates_id) VALUES ({$notification_id}, 'mailing', {$template_id})";
-            getDB()->query($sql);
+
+        
+
+        if (!function_exists('getDB')) {
+            function getDB() {
+                global $DB;
+                if (isset($DB) && is_object($DB)) {
+                    return $DB;
+                } elseif (class_exists('DBConnection') && method_exists('DBConnection', 'getDB')) {
+                    return DBConnection::getDB();
+                } else {
+                    throw new \RuntimeException('No GLPI DB object available');
+                }
+            }
         }
-    }
+        // Local analyzer-only fallback for CronTask and Plugin helpers used in hooks
+        if (!class_exists('CronTask')) {
+            class CronTask { public static function Register($c, $n, $t) {} public static function Unregister($n) {} }
+        }
+
+        if (!class_exists('Plugin')) {
+            class Plugin {
+                public static function isPluginActive($n) { return true; }
+                public static function getPhpDir($n) { return ''; }
+                public static function registerClass($c, $a = []) {}
+            }
+        }
 
     // Alert Ticket Unresolved
     $itemtype = 'GlpiPlugin\\Additionalalerts\\TicketUnresolved';
@@ -469,11 +356,4 @@ function install_notifications_additionalalerts()
     }
     $migration->executeMigration();
     return true;
-
-
-
-
-
-
-
-
+}
