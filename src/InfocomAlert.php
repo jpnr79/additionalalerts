@@ -1,111 +1,8 @@
-    if (!class_exists('Config')) {
-        class Config {
-            public $fields = [];
-            public static function getConfig() { return new self(); }
-            public function getFromDB($id) { return false; }
-            public function useInfocomAlert() { return true; }
-        }
-    }
-    if (!class_exists('NotificationType')) {
-        class NotificationType {
-            public function configType() {}
-        }
-    }
-    if (!function_exists('_sx')) {
-        function _sx($context, $str, $domain = null) { return $str; }
-    }
-if (!class_exists('CommonDBTM')) {
-    class CommonDBTM {
-        public $fields = [];
-        public function getFromDB($id) { return false; }
-        public function getFromDBByCrit($crit) { return false; }
-        public function add($input) { return false; }
-        public function find($criteria = [], $options = []) { return []; }
-    }
-}
-if (!class_exists('CommonGLPI')) {
-    class CommonGLPI {
-        public function getType() { return ''; }
-        public function getField($name) { return null; }
-    }
-}
-if (!class_exists('Alert')) {
-    class Alert {
-        const END = 0;
-        public static function dropdownYesNo($opts) {}
-        public static function dropdownIntegerNever($name, $val) {}
-    }
-}
-if (!class_exists('CronTask')) {
-    class CronTask {
-        public $fields = ["state" => 0];
-        const STATE_DISABLE = 0;
-        public function getFromDBbyName($class, $name) { return false; }
-    }
-}
-if (!class_exists('DbUtils')) {
-    class DbUtils {
-        public static function getDropdownName($table, $id) { return "Name $id"; }
-        public function getUserName($id) { return 'User'.$id; }
-        public function getAllDataFromTable($table) { return []; }
-    }
-}
-if (!class_exists('Dropdown')) {
-    class Dropdown {
-        public static function getDropdownName($table, $id) { return "Name $id"; }
-        public static function showYesNo($name, $val) {}
-        public static function showNumber($name, $val, $a=0,$b=0,$c=0,$d=0,$e=0,$f='',$g=true,$h='',$i='') {}
-    }
-}
-if (!class_exists('Entity')) {
-    class Entity {
-        public function getField($name) { return null; }
-        public function can($id, $right) { return true; }
-    }
-}
-if (!class_exists('Html')) {
-    class Html {
-        public static function hidden($name, $opts=[]) { return ''; }
-        public static function submit($label, $opts=[]) { return ''; }
-        public static function closeForm() { return ''; }
-    }
-}
-if (!class_exists('MassiveAction')) {
-    class MassiveAction {}
-}
-if (!class_exists('NotificationEvent')) {
-    class NotificationEvent {
-        public static function raiseEvent() { return false; }
-    }
-}
-if (!class_exists('Plugin')) {
-    class Plugin {
-        public static function loadLang($plugin) {}
-    }
-}
-if (!class_exists('Session')) {
-    class Session {
-        public static function haveRight($item, $right) { return true; }
-        public static function isMultiEntitiesMode() { return false; }
-        public static function addMessageAfterRedirect($msg, $success = true, $type = 0) {}
-        public static function haveAccessToEntity($id) { return true; }
-    }
-}
-if (!class_exists('Toolbox')) {
-    class Toolbox {
-        public static function getItemTypeFormURL($class) { return ''; }
-    }
-}
-if (!defined('READ')) { define('READ', 1); }
-if (!defined('UPDATE')) { define('UPDATE', 2); }
-if (!defined('ERROR')) { define('ERROR', 3); }
-if (!function_exists('__')) {
-    function __($str, $domain = null) { return $str; }
-}
 
 
 
-class InfocomAlert extends CommonDBTM {
+
+class InfocomAlert extends \CommonDBTM {
     public static function getTypeName($nb = 0) { return 'InfocomAlert'; }
     public static function createTabEntry($str) { return $str; }
     public function getEmpty() { return null; }
@@ -113,7 +10,19 @@ class InfocomAlert extends CommonDBTM {
         return "ti ti-bell-ringing";
     }
     /**
-     * @param CommonGLPI $item
+    use \CommonDBTM;
+    use Toolbox;
+    use Dropdown;
+    use Session;
+    use Entity;
+    use Config;
+    use CronTask;
+    use Html;
+    // If these classes are not in GLPI core, you must implement them in your plugin:
+    // use GlpiPlugin\Additionalalerts\DbUtils;
+    // use GlpiPlugin\Additionalalerts\CommonGLPI;
+    // use GlpiPlugin\Additionalalerts\NotificationEvent;
+    // use GlpiPlugin\Additionalalerts\Alert;
      * @param int        $withtemplate
      * @return string
      */

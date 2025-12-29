@@ -2,13 +2,14 @@
 
 
 
+
 namespace GlpiPlugin\Additionalalerts;
+
 
 use GlpiPlugin\Additionalalerts\InfocomAlert;
 use GlpiPlugin\Additionalalerts\TicketUnresolved;
 use GlpiPlugin\Additionalalerts\InkAlert;
 
-use CommonDBTM;
 
 /*
  * @version $Id: HEADER 15930 2011-10-30 15:47:55Z tsmr $
