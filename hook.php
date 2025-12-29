@@ -255,7 +255,7 @@ function plugin_additionalalerts_getDatabaseRelations()
 {
     global $DB;
     $links = [];
-    if (\GlpiPlugin\Additionalalerts\Plugin::isPluginActive("additionalalerts")) {
+    if (Plugin::isPluginActive("additionalalerts")) {
         // Add any relations if needed
     }
     return $links;
