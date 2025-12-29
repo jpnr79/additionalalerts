@@ -1,8 +1,6 @@
-use Toolbox;
-use Toolbox;
-use DBConnection;
 <?php
 declare(strict_types=1);
+use Toolbox;
 // Local analyzer-only fallback for CronTask and Plugin helpers used in hooks
 if (!class_exists('CronTask')) {
     class CronTask { public static function Register($c, $n, $t) {} public static function Unregister($n) {} }
