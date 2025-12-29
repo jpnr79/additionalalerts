@@ -19,7 +19,6 @@ if (!function_exists('getDB')) {
 // Local analyzer-only fallback for CronTask and Plugin helpers used in hooks
 if (!class_exists('CronTask')) {
     class CronTask { public static function Register($c, $n, $t) {} public static function Unregister($n) {} }
-}
 if (!class_exists('Plugin')) {
     class Plugin { public static function isPluginActive($n) { return true; } public static function getPhpDir($n) { return ''; } public static function registerClass($c, $a = []) {} }
 }
@@ -240,6 +239,7 @@ function plugin_additionalalerts_uninstall()
     \CronTask::Unregister('additionalalerts');
 
     return true;
+}
 
 // Define database relations
 /**
