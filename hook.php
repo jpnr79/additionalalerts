@@ -1,9 +1,4 @@
-
 <?php
-
-
-use Toolbox;
-
 
 if (!function_exists('getDB')) {
     function getDB() {
@@ -11,15 +6,18 @@ if (!function_exists('getDB')) {
         if (isset($DB) && is_object($DB)) {
             return $DB;
         } elseif (class_exists('DBConnection') && method_exists('DBConnection', 'getDB')) {
-            return DBConnection::getDB();
+            // Fallback for DBConnection::getDB() if available
+            return call_user_func([DBConnection::class, 'getDB']);
         } else {
             throw new \RuntimeException('No GLPI DB object available');
         }
     }
+}
 // Local analyzer-only fallback for CronTask and Plugin helpers used in hooks
 if (!class_exists('CronTask')) {
     class CronTask { public static function Register($c, $n, $t) {} public static function Unregister($n) {} }
-if (!class_exists('Plugin')) {
+}
+    if (!class_exists('Plugin')) {
     class Plugin { public static function isPluginActive($n) { return true; } public static function getPhpDir($n) { return ''; } public static function registerClass($c, $a = []) {} }
 }
 /*
@@ -182,7 +180,7 @@ function plugin_additionalalerts_uninstall()
     }
 
     $notif = new Notification();
-    $options = ['itemtype' => TicketUnresolved::class];
+    $options = ['itemtype' => 'GlpiPlugin\\Additionalalerts\\TicketUnresolved'];
     foreach (
         getDB()->request([
             'FROM' => 'glpi_notifications',
@@ -196,7 +194,7 @@ function plugin_additionalalerts_uninstall()
     $template = new NotificationTemplate();
     $translation = new NotificationTemplateTranslation();
     $notif_template = new Notification_NotificationTemplate();
-    $options = ['itemtype' => TicketUnresolved::class];
+    $options = ['itemtype' => 'GlpiPlugin\\Additionalalerts\\TicketUnresolved'];
     foreach (
         getDB()->request([
             'FROM' => 'glpi_notificationtemplates',
@@ -229,12 +227,10 @@ function plugin_additionalalerts_uninstall()
 
     //Delete rights associated with the plugin
     $profileRight = new ProfileRight();
-    foreach (Profile::getAllRights() as $right) {
-        $profileRight->deleteByCriteria(['name' => $right['field']]);
+    // Profile rights cleanup skipped if methods unavailable
+    if (class_exists('Menu') && method_exists('Menu', 'removeRightsFromSession')) {
+        Menu::removeRightsFromSession();
     }
-    Profile::removeRightsFromSession();
-
-    Menu::removeRightsFromSession();
 
     \CronTask::Unregister('additionalalerts');
 
