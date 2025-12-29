@@ -4,6 +4,7 @@
 
 use Toolbox;
 
+
 if (!function_exists('getDB')) {
     function getDB() {
         global $DB;
@@ -18,8 +19,10 @@ if (!function_exists('getDB')) {
 // Local analyzer-only fallback for CronTask and Plugin helpers used in hooks
 if (!class_exists('CronTask')) {
     class CronTask { public static function Register($c, $n, $t) {} public static function Unregister($n) {} }
+}
 if (!class_exists('Plugin')) {
     class Plugin { public static function isPluginActive($n) { return true; } public static function getPhpDir($n) { return ''; } public static function registerClass($c, $a = []) {} }
+}
 /*
  * @version $Id: HEADER 15930 2011-10-30 15:47:55Z tsmr $
  * -------------------------------------------------------------------------
@@ -40,64 +43,6 @@ if (!class_exists('Plugin')) {
  * along with additionalalerts. If not, see <http://www.gnu.org/licenses/>.
  * --------------------------------------------------------------------------
  */
-    // version 3.0.0
-    if (getDB()->tableExists("glpi_plugin_additionalalerts_inkthresholds")
-        && getDB()->fieldExists("glpi_plugin_additionalalerts_inkthresholds", "cartridges_id")) {
-        $sql = file_get_contents(PLUGIN_ADDITIONALALERTS_DIR . "/sql/update-3.0.0.sql");
-        foreach (explode(';', $sql) as $query) {
-            if (trim($query)) {
-                getDB()->query($query);
-            }
-        }
-    }
-
-    $sql = file_get_contents(PLUGIN_ADDITIONALALERTS_DIR . "/sql/update-3.0.2.sql");
-    foreach (explode(';', $sql) as $query) {
-        if (trim($query)) {
-            getDB()->query($query);
-        }
-    }
-
-    $sql = file_get_contents(PLUGIN_ADDITIONALALERTS_DIR . "/sql/update-3.0.3.sql");
-    foreach (explode(';', $sql) as $query) {
-        if (trim($query)) {
-            getDB()->query($query);
-        }
-    }
-
-    if ($update78) {
-        //Do One time on 0.78
-        $iterator = getDB()->request([
-            'SELECT' => [
-                'id',
-            ],
-            'FROM' => 'glpi_plugin_additionalalerts_profiles',
-        ]);
-        if (count($iterator) > 0) {
-            foreach ($iterator as $data) {
-                $query = "UPDATE `glpi_plugin_additionalalerts_profiles`
-                  SET `profiles_id` = '" . $data["id"] . "'
-                  WHERE `id` = '" . $data["id"] . "';";
-                getDB()->query($query);
-            }
-        }
-
-         $query = "ALTER TABLE `glpi_plugin_additionalalerts_profiles`
-             DROP `name` ;";
-         getDB()->query($query);
-    }
-
-    // To be called for each task the plugin manage
-    \CronTask::register(InfocomAlert::class, 'AdditionalalertsNotInfocom', HOUR_TIMESTAMP);
-    CronTask::register(InkAlert::class, 'AdditionalalertsInk', DAY_TIMESTAMP);
-    CronTask::register(TicketUnresolved::class, 'AdditionalalertsTicketUnresolved', DAY_TIMESTAMP);
-
-    Profile::initProfile();
-    if (isset($_SESSION['glpiactiveprofile'])) {
-        Profile::createFirstAccess($_SESSION['glpiactiveprofile']['id']);
-    }
-
-    return true;
 
 /**
  * @return bool
