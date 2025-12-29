@@ -1,3 +1,6 @@
+use Toolbox;
+use Toolbox;
+use DBConnection;
 <?php
 declare(strict_types=1);
 // Local analyzer-only fallback for CronTask and Plugin helpers used in hooks
@@ -55,41 +58,41 @@ function plugin_additionalalerts_install()
     if (!$DB->tableExists("glpi_plugin_additionalalerts_ticketunresolveds")
         && !$DB->tableExists("glpi_plugin_additionalalerts_configs")) {
         $install = true;
-        $DB->runFile(PLUGIN_ADDITIONALALERTS_DIR . "/sql/empty-3.0.0.sql");
+        Toolbox::runSQLFile(PLUGIN_ADDITIONALALERTS_DIR . "/sql/empty-3.0.0.sql");
         install_notifications_additionalalerts();
     }
 
     if ($DB->tableExists("glpi_plugin_alerting_profiles")
         && $DB->fieldExists("glpi_plugin_alerting_profiles", "interface")) {
         $update78 = true;
-        $DB->runFile(PLUGIN_ADDITIONALALERTS_DIR . "/sql/update-1.2.0.sql");
-        $DB->runFile(PLUGIN_ADDITIONALALERTS_DIR . "/sql/update-1.3.0.sql");
+        Toolbox::runSQLFile(PLUGIN_ADDITIONALALERTS_DIR . "/sql/update-1.2.0.sql");
+        Toolbox::runSQLFile(PLUGIN_ADDITIONALALERTS_DIR . "/sql/update-1.3.0.sql");
     }
 
     if (!$DB->tableExists("glpi_plugin_additionalalerts_infocomalerts")) {
         $update78 = true;
-        $DB->runFile(PLUGIN_ADDITIONALALERTS_DIR . "/sql/update-1.3.0.sql");
+        Toolbox::runSQLFile(PLUGIN_ADDITIONALALERTS_DIR . "/sql/update-1.3.0.sql");
     }
 
     if (!$DB->tableExists("glpi_plugin_additionalalerts_inkalerts")) {
-        $DB->runFile(PLUGIN_ADDITIONALALERTS_DIR . "/sql/update-1.7.1.sql");
+        Toolbox::runSQLFile(PLUGIN_ADDITIONALALERTS_DIR . "/sql/update-1.7.1.sql");
     }
 
     //version 1.8.0
     if (!$DB->tableExists("glpi_plugin_additionalalerts_ticketunresolveds")) {
         $update90 = true;
-        $DB->runFile(PLUGIN_ADDITIONALALERTS_DIR . "/sql/update-1.8.0.sql");
+        Toolbox::runSQLFile(PLUGIN_ADDITIONALALERTS_DIR . "/sql/update-1.8.0.sql");
     }
 
     // version 3.0.0
     if ($DB->tableExists("glpi_plugin_additionalalerts_inkthresholds")
         && $DB->fieldExists("glpi_plugin_additionalalerts_inkthresholds", "cartridges_id")) {
-        $DB->runFile(PLUGIN_ADDITIONALALERTS_DIR . "/sql/update-3.0.0.sql");
+        Toolbox::runSQLFile(PLUGIN_ADDITIONALALERTS_DIR . "/sql/update-3.0.0.sql");
     }
 
-    $DB->runFile(PLUGIN_ADDITIONALALERTS_DIR . "/sql/update-3.0.2.sql");
+    Toolbox::runSQLFile(PLUGIN_ADDITIONALALERTS_DIR . "/sql/update-3.0.2.sql");
 
-    $DB->runFile(PLUGIN_ADDITIONALALERTS_DIR . "/sql/update-3.0.3.sql");
+    Toolbox::runSQLFile(PLUGIN_ADDITIONALALERTS_DIR . "/sql/update-3.0.3.sql");
 
     if ($update78) {
         //Do One time on 0.78
@@ -114,7 +117,7 @@ function plugin_additionalalerts_install()
     }
 
     // To be called for each task the plugin manage
-    CronTask::register(InfocomAlert::class, 'AdditionalalertsNotInfocom', HOUR_TIMESTAMP);
+    \CronTask::register(\GlpiPlugin\Additionalalerts\InfocomAlert::class, 'AdditionalalertsNotInfocom', HOUR_TIMESTAMP);
     CronTask::register(InkAlert::class, 'AdditionalalertsInk', DAY_TIMESTAMP);
     CronTask::register(TicketUnresolved::class, 'AdditionalalertsTicketUnresolved', DAY_TIMESTAMP);
 
@@ -168,6 +171,7 @@ function plugin_additionalalerts_uninstall()
     }
 
 
+
     $notif = new Notification();
     $options = ['itemtype' => InkAlert::class];
     foreach (
@@ -178,6 +182,9 @@ function plugin_additionalalerts_uninstall()
     ) {
         $notif->delete($data);
     }
+
+
+    // Use fully qualified CronTask class everywhere
 
     //templates
     $template = new NotificationTemplate();
@@ -215,7 +222,7 @@ function plugin_additionalalerts_uninstall()
     }
 
     $notif = new Notification();
-    $options = ['itemtype' => InfocomAlert::class];
+    $options = ['itemtype' => \GlpiPlugin\Additionalalerts\InfocomAlert::class];
     foreach (
         $DB->request([
             'FROM' => 'glpi_notifications',
@@ -229,7 +236,7 @@ function plugin_additionalalerts_uninstall()
     $template = new NotificationTemplate();
     $translation = new NotificationTemplateTranslation();
     $notif_template = new Notification_NotificationTemplate();
-    $options = ['itemtype' => InfocomAlert::class];
+    $options = ['itemtype' => \GlpiPlugin\Additionalalerts\InfocomAlert::class];
     foreach (
         $DB->request([
             'FROM' => 'glpi_notificationtemplates',
@@ -315,7 +322,7 @@ function plugin_additionalalerts_uninstall()
 
     Menu::removeRightsFromSession();
 
-    \GlpiPlugin\Additionalalerts\CronTask::Unregister('additionalalerts');
+    \CronTask::Unregister('additionalalerts');
 
     return true;
 }
