@@ -428,61 +428,52 @@ function install_notifications_additionalalerts()
 
     // Notification
     // Request
-    $options_notif        = ['itemtype' => InkAlert::class,
-        'name' => 'Alert ink level'];
-    getDB()->insert(
-        "glpi_notificationtemplates",
-        $options_notif
-    );
-
-    foreach (getDB()->request([
-        'FROM' => 'glpi_notificationtemplates',
-        'WHERE' => $options_notif]) as $data) {
-        $templates_id = $data['id'];
-
-        $itemtype = 'GlpiPlugin\\Additionalalerts\\InkAlert';
-        $sql = "INSERT INTO glpi_notificationtemplates (itemtype, name) VALUES ('{$itemtype}', 'Alert ink level')";
+    // Alert ink level
+    $itemtype = 'GlpiPlugin\\Additionalalerts\\InkAlert';
+    $sql = "INSERT INTO glpi_notificationtemplates (itemtype, name) VALUES ('{$itemtype}', 'Alert ink level')";
+    getDB()->query($sql);
+    $template_id = getDB()->insert_id ? getDB()->insert_id : null;
+    if ($template_id) {
+        $subject = '##lang.ink.title## : ##ink.entity##';
+        $content_text = '##lang.ink.title## :\n          ##FOREACHinks##\n          - ##ink.printer## - ##ink.cartridge## - ##ink.state##%\n          ##ENDFOREACHinks##';
+        $content_html = '&lt;table class=\"tab_cadre\" border=\"1\" cellspacing=\"2\" cellpadding=\"3\"&gt;\n          &lt;tbody&gt;\n          &lt;tr&gt;\n          &lt;td style=\"text-align: left;\" bgcolor=\"#cccccc\"&gt;&lt;span style=\"font-family: Verdana; font-size: 11px; text-align: left;\"&gt;##lang.ink.printer##&lt;/span&gt;&lt;/td&gt;\n          &lt;td style=\"text-align: left;\" bgcolor=\"#cccccc\"&gt;&lt;span style=\"font-family: Verdana; font-size: 11px; text-align: left;\"&gt;##lang.ink.cartridge##&lt;/span&gt;&lt;/td&gt;\n          &lt;td style=\"text-align: left;\" bgcolor=\"#cccccc\"&gt;&lt;span style=\"font-family: Verdana; font-size: 11px; text-align: left;\"&gt;##ink.state##%&lt;/span&gt;&lt;/td&gt;\n          &lt;/tr&gt;\n          ##FOREACHinks##\n          &lt;tr&gt;\n          &lt;td&gt;&lt;a href=\"##ink.urlprinter##\"&gt;&lt;span style=\"font-family: Verdana; font-size: 11px; text-align: left;\"&gt;##ink.printer##&lt;/span&gt;&lt;/a&gt;&lt;/td&gt;\n          &lt;td&gt;&lt;a href=\"##ink.urlcartridge##\"&gt;&lt;span style=\"font-family: Verdana; font-size: 11px; text-align: left;\"&gt;##ink.cartridge##&lt;/span&gt;&lt;/a&gt;&lt;/td&gt;\n          &lt;td&gt;&lt;span style=\"font-family: Verdana; font-size: 11px; text-align: left;\"&gt;##ink.state##%&lt;/span&gt;&lt;/td&gt;\n          &lt;/tr&gt;\n          ##ENDFOREACHinks##\n          &lt;/tbody&gt;\n          &lt;/table&gt;';
+        $sql = "INSERT INTO glpi_notificationtemplatetranslations (notificationtemplates_id, subject, content_text, content_html) VALUES ({$template_id}, '" . addslashes($subject) . "', '" . addslashes($content_text) . "', '" . addslashes($content_html) . "')";
         getDB()->query($sql);
-        $template_id = getDB()->insert_id ? getDB()->insert_id : null;
-        if ($template_id) {
-            $subject = '##lang.ink.title## : ##ink.entity##';
-            $content_text = '##lang.ink.title## :\n          ##FOREACHinks##\n          - ##ink.printer## - ##ink.cartridge## - ##ink.state##%\n          ##ENDFOREACHinks##';
-            $content_html = '&lt;table class=\"tab_cadre\" border=\"1\" cellspacing=\"2\" cellpadding=\"3\"&gt;\n          &lt;tbody&gt;\n          &lt;tr&gt;\n          &lt;td style=\"text-align: left;\" bgcolor=\"#cccccc\"&gt;&lt;span style=\"font-family: Verdana; font-size: 11px; text-align: left;\"&gt;##lang.ink.printer##&lt;/span&gt;&lt;/td&gt;\n          &lt;td style=\"text-align: left;\" bgcolor=\"#cccccc\"&gt;&lt;span style=\"font-family: Verdana; font-size: 11px; text-align: left;\"&gt;##lang.ink.cartridge##&lt;/span&gt;&lt;/td&gt;\n          &lt;td style=\"text-align: left;\" bgcolor=\"#cccccc\"&gt;&lt;span style=\"font-family: Verdana; font-size: 11px; text-align: left;\"&gt;##lang.ink.state##&lt;/span&gt;&lt;/td&gt;\n          &lt;/tr&gt;\n          ##FOREACHinks##\n          &lt;tr&gt;\n          &lt;td&gt;&lt;a href=\"##ink.urlprinter##\"&gt;&lt;span style=\"font-family: Verdana; font-size: 11px; text-align: left;\"&gt;##ink.printer##&lt;/span&gt;&lt;/a&gt;&lt;/td&gt;\n          &lt;td&gt;&lt;a href=\"##ink.urlcartridge##\"&gt;&lt;span style=\"font-family: Verdana; font-size: 11px; text-align: left;\"&gt;##ink.cartridge##&lt;/span&gt;&lt;/a&gt;&lt;/td&gt;\n          &lt;td&gt;&lt;span style=\"font-family: Verdana; font-size: 11px; text-align: left;\"&gt;##ink.state##%&lt;/span&gt;&lt;/td&gt;\n          &lt;/tr&gt;\n          ##ENDFOREACHinks##\n          &lt;/tbody&gt;\n          &lt;/table&gt;';
-            $sql = "INSERT INTO glpi_notificationtemplatetranslations (notificationtemplates_id, subject, content_text, content_html) VALUES ({$template_id}, '" . addslashes($subject) . "', '" . addslashes($content_text) . "', '" . addslashes($content_html) . "')";
-            getDB()->query($sql);
-            $sql = "INSERT INTO glpi_notifications (name, entities_id, itemtype, event, is_recursive) VALUES ('Alert ink level', 0, '{$itemtype}', 'ink', 1)";
-            getDB()->query($sql);
-            $notification_id = getDB()->insert_id ? getDB()->insert_id : null;
-            if ($notification_id) {
-                $sql = "INSERT INTO glpi_notifications_notificationtemplates (notifications_id, mode, notificationtemplates_id) VALUES ({$notification_id}, 'mailing', {$template_id})";
-                getDB()->query($sql);
-            }
-        }
-        }
-
-        // Alert Ticket Unresolved
-        // Alert Ticket Unresolved
-        $itemtype = 'GlpiPlugin\\Additionalalerts\\TicketUnresolved';
-        $sql = "INSERT INTO glpi_notificationtemplates (itemtype, name) VALUES ('{$itemtype}', 'Alert Ticket Unresolved')";
+        $sql = "INSERT INTO glpi_notifications (name, entities_id, itemtype, event, is_recursive) VALUES ('Alert ink level', 0, '{$itemtype}', 'ink', 1)";
         getDB()->query($sql);
-        $template_id = getDB()->insert_id ? getDB()->insert_id : null;
-        if ($template_id) {
-            $subject = '##ticket.action## ##ticket.entity##';
-            $content_text = '##ticket.action## ##ticket.entity##\n         ##FOREACHtickets##\n\n          ##lang.ticket.title## : ##ticket.title##\n           ##lang.ticket.status## : ##ticket.status##\n\n           ##ticket.url##\n           ##ENDFOREACHtickets##';
-            $content_html = '&lt;table class=\"tab_cadre\" border=\"1\" cellspacing=\"2\" cellpadding=\"3\"&gt;\n    &lt;tbody&gt;\n    &lt;tr&gt;\n    &lt;td style=\"text-align: left;\" width=\"auto\" bgcolor=\"#95bde4\"&gt;&lt;span style=\"font-family: Verdana; font-size: 11px; text-align: left;\"&gt;##lang.ticket.authors##&lt;/span&gt;&lt;/td&gt;\n    &lt;td style=\"text-align: left;\" width=\"auto\" bgcolor=\"#95bde4\"&gt;&lt;span style=\"font-family: Verdana; font-size: 11px; text-align: left;\"&gt;##lang.ticket.title##&lt;/span&gt;&lt;/td&gt;';
-            $sql = "INSERT INTO glpi_notificationtemplatetranslations (notificationtemplates_id, subject, content_text, content_html) VALUES ({$template_id}, '" . addslashes($subject) . "', '" . addslashes($content_text) . "', '" . addslashes($content_html) . "')";
+        $notification_id = getDB()->insert_id ? getDB()->insert_id : null;
+        if ($notification_id) {
+            $sql = "INSERT INTO glpi_notifications_notificationtemplates (notifications_id, mode, notificationtemplates_id) VALUES ({$notification_id}, 'mailing', {$template_id})";
             getDB()->query($sql);
-            $sql = "INSERT INTO glpi_notifications (name, entities_id, itemtype, event, is_recursive) VALUES ('Alert Ticket Unresolved', 0, '{$itemtype}', 'ticketunresolved', 1)";
-            getDB()->query($sql);
-            $notification_id = getDB()->insert_id ? getDB()->insert_id : null;
-            if ($notification_id) {
-                $sql = "INSERT INTO glpi_notifications_notificationtemplates (notifications_id, mode, notificationtemplates_id) VALUES ({$notification_id}, 'mailing', {$template_id})";
-                getDB()->query($sql);
-            }
         }
-        // ...existing code for migration and return...
+    }
 
-        // ...existing code for migration and return...
-        $migration->executeMigration();
-        return true;
+    // Alert Ticket Unresolved
+    $itemtype = 'GlpiPlugin\\Additionalalerts\\TicketUnresolved';
+    $sql = "INSERT INTO glpi_notificationtemplates (itemtype, name) VALUES ('{$itemtype}', 'Alert Ticket Unresolved')";
+    getDB()->query($sql);
+    $template_id = getDB()->insert_id ? getDB()->insert_id : null;
+    if ($template_id) {
+        $subject = '##ticket.action## ##ticket.entity##';
+        $content_text = '##ticket.action## ##ticket.entity##\n         ##FOREACHtickets##\n\n          ##lang.ticket.title## : ##ticket.title##\n           ##lang.ticket.status## : ##ticket.status##\n\n           ##ticket.url##\n           ##ENDFOREACHtickets##';
+        $content_html = '&lt;table class=\"tab_cadre\" border=\"1\" cellspacing=\"2\" cellpadding=\"3\"&gt;\n    &lt;tbody&gt;\n    &lt;tr&gt;\n    &lt;td style=\"text-align: left;\" width=\"auto\" bgcolor=\"#95bde4\"&gt;&lt;span style=\"font-family: Verdana; font-size: 11px; text-align: left;\"&gt;##lang.ticket.authors##&lt;/span&gt;&lt;/td&gt;\n    &lt;td style=\"text-align: left;\" width=\"auto\" bgcolor=\"#95bde4\"&gt;&lt;span style=\"font-family: Verdana; font-size: 11px; text-align: left;\"&gt;##lang.ticket.title##&lt;/span&gt;&lt;/td&gt;';
+        $sql = "INSERT INTO glpi_notificationtemplatetranslations (notificationtemplates_id, subject, content_text, content_html) VALUES ({$template_id}, '" . addslashes($subject) . "', '" . addslashes($content_text) . "', '" . addslashes($content_html) . "')";
+        getDB()->query($sql);
+        $sql = "INSERT INTO glpi_notifications (name, entities_id, itemtype, event, is_recursive) VALUES ('Alert Ticket Unresolved', 0, '{$itemtype}', 'ticketunresolved', 1)";
+        getDB()->query($sql);
+        $notification_id = getDB()->insert_id ? getDB()->insert_id : null;
+        if ($notification_id) {
+            $sql = "INSERT INTO glpi_notifications_notificationtemplates (notifications_id, mode, notificationtemplates_id) VALUES ({$notification_id}, 'mailing', {$template_id})";
+            getDB()->query($sql);
+        }
+    }
+    $migration->executeMigration();
+    return true;
+
+
+
+
+
+
+
 
