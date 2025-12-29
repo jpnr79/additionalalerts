@@ -1,3 +1,12 @@
+/**
+ * Install function for the additionalalerts plugin
+ * @return bool
+ */
+function plugin_additionalalerts_install()
+{
+    // Add install logic here if needed
+    return true;
+}
 <?php
 
 if (!function_exists('getDB')) {
