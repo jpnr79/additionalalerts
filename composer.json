@@ -1,0 +1,12 @@
+{
+    "name": "infotelglpi/additionalalerts",
+    "description": "GLPI Additional Alerts Plugin",
+    "type": "glpi-plugin",
+    "license": "GPL-2.0-or-later",
+    "autoload": {
+        "psr-4": {
+            "GlpiPlugin\\Additionalalerts\\": "src/"
+        }
+    },
+    "require": {}
+}

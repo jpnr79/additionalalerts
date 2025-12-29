@@ -1,68 +1,15 @@
 <?php
 
+
+
 namespace GlpiPlugin\Additionalalerts;
 
-// Fallbacks for when GLPI core is not loaded
-if (!class_exists('CommonDBTM')) {
-    class CommonDBTM {
-        public $fields = [];
-        public function getFromDBByCrit($crit) { return false; }
-    }
-}
-if (!class_exists('CronTask')) {
-    class CronTask {
-        public $fields = ["state" => 0];
-        const STATE_DISABLE = 0;
-        public function getFromDBbyName($class, $name) { return false; }
-    }
-}
-if (!class_exists('Dropdown')) {
-    class Dropdown {
-        public static function getDropdownName($table, $id) { return "Name $id"; }
-    }
-}
-if (!class_exists('Session')) {
-    class Session {
-        public static function haveRight($item, $right) { return true; }
-        public static function isMultiEntitiesMode() { return false; }
-    }
-}
-if (!defined('READ')) {
-    define('READ', 1);
-}
-if (!function_exists('__')) {
-    function __($str, $domain = null) { return $str; }
-}
-if (!function_exists('_n')) {
-    function _n($single, $plural, $number, $domain = null) { return $number == 1 ? $single : $plural; }
-}
-// Fallbacks for plugin-local classes with fields/getFromDBByCrit
-if (!class_exists('GlpiPlugin\\Additionalalerts\\InfocomAlert')) {
-    class InfocomAlert {
-        public $fields = [];
-        public function getFromDBByCrit($crit) { return false; }
-        public static function getTypeName($nb = 0) { return 'InfocomAlert'; }
-        public static function query($entity) { return ''; }
-        public static function displayBody($data) { return ''; }
-    }
-}
-if (!class_exists('GlpiPlugin\\Additionalalerts\\TicketUnresolved')) {
-    class TicketUnresolved {
-        public $fields = [];
-        public function getFromDBByCrit($crit) { return false; }
-        public static function getEntitiesToNotify($key) { return []; }
-        public static function query($delay, $entity) { return ''; }
-        public static function displayBody($data) { return ''; }
-    }
-}
-if (!class_exists('GlpiPlugin\\Additionalalerts\\InkAlert')) {
-    class InkAlert {
-        public $fields = [];
-        public function getFromDBByCrit($crit) { return false; }
-        public static function query($entity) { return ''; }
-        public static function displayBody($data) { return ''; }
-    }
-}
+use GlpiPlugin\Additionalalerts\InfocomAlert;
+use GlpiPlugin\Additionalalerts\TicketUnresolved;
+use GlpiPlugin\Additionalalerts\InkAlert;
+
+use CommonDBTM;
+
 /*
  * @version $Id: HEADER 15930 2011-10-30 15:47:55Z tsmr $
  -------------------------------------------------------------------------
