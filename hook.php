@@ -1,6 +1,21 @@
+
 <?php
 declare(strict_types=1);
+
 use Toolbox;
+
+if (!function_exists('getDB')) {
+    function getDB() {
+        global $DB;
+        if (isset($DB) && is_object($DB)) {
+            return $DB;
+        } elseif (class_exists('DBConnection') && method_exists('DBConnection', 'getDB')) {
+            return DBConnection::getDB();
+        } else {
+            throw new \RuntimeException('No GLPI DB object available');
+        }
+    }
+}
 // Local analyzer-only fallback for CronTask and Plugin helpers used in hooks
 if (!class_exists('CronTask')) {
     class CronTask { public static function Register($c, $n, $t) {} public static function Unregister($n) {} }
@@ -48,53 +63,107 @@ use GlpiPlugin\Additionalalerts\TicketUnresolved;
  */
 function plugin_additionalalerts_install()
 {
-    global $DB;
+    // use getDB() for DB access
 
     $update78 = false;
 
     //INSTALL
-    if (!$DB->tableExists("glpi_plugin_additionalalerts_ticketunresolveds")
-        && !$DB->tableExists("glpi_plugin_additionalalerts_configs")) {
+    if (!getDB()->tableExists("glpi_plugin_additionalalerts_ticketunresolveds")
+        && !getDB()->tableExists("glpi_plugin_additionalalerts_configs")) {
         $install = true;
-        Toolbox::runSQLFile(PLUGIN_ADDITIONALALERTS_DIR . "/sql/empty-3.0.0.sql");
+        $sql = file_get_contents(PLUGIN_ADDITIONALALERTS_DIR . "/sql/empty-3.0.0.sql");
+        foreach (explode(';', $sql) as $query) {
+            if (trim($query)) {
+                getDB()->query($query);
+            }
+        }
         install_notifications_additionalalerts();
     }
 
-    if ($DB->tableExists("glpi_plugin_alerting_profiles")
-        && $DB->fieldExists("glpi_plugin_alerting_profiles", "interface")) {
+    if (getDB()->tableExists("glpi_plugin_alerting_profiles")
+        && getDB()->fieldExists("glpi_plugin_alerting_profiles", "interface")) {
         $update78 = true;
-        Toolbox::runSQLFile(PLUGIN_ADDITIONALALERTS_DIR . "/sql/update-1.2.0.sql");
-        Toolbox::runSQLFile(PLUGIN_ADDITIONALALERTS_DIR . "/sql/update-1.3.0.sql");
+        $sql = file_get_contents(PLUGIN_ADDITIONALALERTS_DIR . "/sql/update-1.2.0.sql");
+        foreach (explode(';', $sql) as $query) {
+            if (trim($query)) {
+                getDB()->query($query);
+            }
+        }
+        $sql = file_get_contents(PLUGIN_ADDITIONALALERTS_DIR . "/sql/update-1.3.0.sql");
+        foreach (explode(';', $sql) as $query) {
+            if (trim($query)) {
+                getDB()->query($query);
+            }
+        }
     }
 
-    if (!$DB->tableExists("glpi_plugin_additionalalerts_infocomalerts")) {
+    if (!getDB()->tableExists("glpi_plugin_additionalalerts_infocomalerts")) {
         $update78 = true;
-        Toolbox::runSQLFile(PLUGIN_ADDITIONALALERTS_DIR . "/sql/update-1.3.0.sql");
+        if (method_exists('Toolbox', 'runSQLFile')) {
+            $sql = file_get_contents(PLUGIN_ADDITIONALALERTS_DIR . "/sql/update-1.3.0.sql");
+            foreach (explode(';', $sql) as $query) {
+                if (trim($query)) {
+                    getDB()->query($query);
+                }
+            }
+        } else {
+            $sql = file_get_contents(PLUGIN_ADDITIONALALERTS_DIR . "/sql/update-1.3.0.sql");
+            foreach (explode(';', $sql) as $query) {
+                if (trim($query)) {
+                    getDB()->query($query);
+                }
+            }
+        }
     }
 
-    if (!$DB->tableExists("glpi_plugin_additionalalerts_inkalerts")) {
-        Toolbox::runSQLFile(PLUGIN_ADDITIONALALERTS_DIR . "/sql/update-1.7.1.sql");
+    if (!getDB()->tableExists("glpi_plugin_additionalalerts_inkalerts")) {
+        $sql = file_get_contents(PLUGIN_ADDITIONALALERTS_DIR . "/sql/update-1.7.1.sql");
+        foreach (explode(';', $sql) as $query) {
+            if (trim($query)) {
+                getDB()->query($query);
+            }
+        }
     }
 
     //version 1.8.0
-    if (!$DB->tableExists("glpi_plugin_additionalalerts_ticketunresolveds")) {
+    if (!getDB()->tableExists("glpi_plugin_additionalalerts_ticketunresolveds")) {
         $update90 = true;
-        Toolbox::runSQLFile(PLUGIN_ADDITIONALALERTS_DIR . "/sql/update-1.8.0.sql");
+        $sql = file_get_contents(PLUGIN_ADDITIONALALERTS_DIR . "/sql/update-1.8.0.sql");
+        foreach (explode(';', $sql) as $query) {
+            if (trim($query)) {
+                getDB()->query($query);
+            }
+        }
     }
 
     // version 3.0.0
-    if ($DB->tableExists("glpi_plugin_additionalalerts_inkthresholds")
-        && $DB->fieldExists("glpi_plugin_additionalalerts_inkthresholds", "cartridges_id")) {
-        Toolbox::runSQLFile(PLUGIN_ADDITIONALALERTS_DIR . "/sql/update-3.0.0.sql");
+    if (getDB()->tableExists("glpi_plugin_additionalalerts_inkthresholds")
+        && getDB()->fieldExists("glpi_plugin_additionalalerts_inkthresholds", "cartridges_id")) {
+        $sql = file_get_contents(PLUGIN_ADDITIONALALERTS_DIR . "/sql/update-3.0.0.sql");
+        foreach (explode(';', $sql) as $query) {
+            if (trim($query)) {
+                getDB()->query($query);
+            }
+        }
     }
 
-    Toolbox::runSQLFile(PLUGIN_ADDITIONALALERTS_DIR . "/sql/update-3.0.2.sql");
+    $sql = file_get_contents(PLUGIN_ADDITIONALALERTS_DIR . "/sql/update-3.0.2.sql");
+    foreach (explode(';', $sql) as $query) {
+        if (trim($query)) {
+            getDB()->query($query);
+        }
+    }
 
-    Toolbox::runSQLFile(PLUGIN_ADDITIONALALERTS_DIR . "/sql/update-3.0.3.sql");
+    $sql = file_get_contents(PLUGIN_ADDITIONALALERTS_DIR . "/sql/update-3.0.3.sql");
+    foreach (explode(';', $sql) as $query) {
+        if (trim($query)) {
+            getDB()->query($query);
+        }
+    }
 
     if ($update78) {
         //Do One time on 0.78
-        $iterator = $DB->request([
+        $iterator = getDB()->request([
             'SELECT' => [
                 'id',
             ],
@@ -105,17 +174,17 @@ function plugin_additionalalerts_install()
                 $query = "UPDATE `glpi_plugin_additionalalerts_profiles`
                   SET `profiles_id` = '" . $data["id"] . "'
                   WHERE `id` = '" . $data["id"] . "';";
-                $DB->query($query);
+                getDB()->query($query);
             }
         }
 
-        $query = "ALTER TABLE `glpi_plugin_additionalalerts_profiles`
-               DROP `name` ;";
-        $DB->query($query);
+         $query = "ALTER TABLE `glpi_plugin_additionalalerts_profiles`
+             DROP `name` ;";
+         getDB()->query($query);
     }
 
     // To be called for each task the plugin manage
-    \CronTask::register(\GlpiPlugin\Additionalalerts\InfocomAlert::class, 'AdditionalalertsNotInfocom', HOUR_TIMESTAMP);
+    \CronTask::register(InfocomAlert::class, 'AdditionalalertsNotInfocom', HOUR_TIMESTAMP);
     CronTask::register(InkAlert::class, 'AdditionalalertsInk', DAY_TIMESTAMP);
     CronTask::register(TicketUnresolved::class, 'AdditionalalertsTicketUnresolved', DAY_TIMESTAMP);
 
@@ -132,7 +201,7 @@ function plugin_additionalalerts_install()
  */
 function plugin_additionalalerts_uninstall()
 {
-    global $DB;
+    // use getDB() for DB access
 
     $tables = [
         "glpi_plugin_additionalalerts_infocomalerts",
@@ -145,7 +214,7 @@ function plugin_additionalalerts_uninstall()
     ];
 
     foreach ($tables as $table) {
-        $DB->dropTable($table, true);
+        getDB()->dropTable($table, true);
     }
 
     //old versions
@@ -165,7 +234,7 @@ function plugin_additionalalerts_uninstall()
     ];
 
     foreach ($tables as $table) {
-        $DB->dropTable($table, true);
+        getDB()->dropTable($table, true);
     }
 
 
@@ -173,7 +242,7 @@ function plugin_additionalalerts_uninstall()
     $notif = new Notification();
     $options = ['itemtype' => InkAlert::class];
     foreach (
-        $DB->request([
+        getDB()->request([
             'FROM' => 'glpi_notifications',
             'WHERE' => $options
         ]) as $data
@@ -190,7 +259,7 @@ function plugin_additionalalerts_uninstall()
     $notif_template = new Notification_NotificationTemplate();
     $options = ['itemtype' => InkAlert::class];
     foreach (
-        $DB->request([
+        getDB()->request([
             'FROM' => 'glpi_notificationtemplates',
             'WHERE' => $options
         ]) as $data
@@ -200,7 +269,7 @@ function plugin_additionalalerts_uninstall()
         ];
 
         foreach (
-            $DB->request([
+            getDB()->request([
                 'FROM' => 'glpi_notificationtemplatetranslations',
                 'WHERE' => $options_template
             ]) as $data_template
@@ -210,7 +279,7 @@ function plugin_additionalalerts_uninstall()
         $template->delete($data);
 
         foreach (
-            $DB->request([
+            getDB()->request([
                 'FROM' => 'glpi_notifications_notificationtemplates',
                 'WHERE' => $options_template
             ]) as $data_template
@@ -220,9 +289,9 @@ function plugin_additionalalerts_uninstall()
     }
 
     $notif = new Notification();
-    $options = ['itemtype' => \GlpiPlugin\Additionalalerts\InfocomAlert::class];
+    $options = ['itemtype' => 'GlpiPlugin\\Additionalalerts\\InfocomAlert'];
     foreach (
-        $DB->request([
+        getDB()->request([
             'FROM' => 'glpi_notifications',
             'WHERE' => $options
         ]) as $data
@@ -234,9 +303,9 @@ function plugin_additionalalerts_uninstall()
     $template = new NotificationTemplate();
     $translation = new NotificationTemplateTranslation();
     $notif_template = new Notification_NotificationTemplate();
-    $options = ['itemtype' => \GlpiPlugin\Additionalalerts\InfocomAlert::class];
+    $options = ['itemtype' => 'GlpiPlugin\\Additionalalerts\\InfocomAlert'];
     foreach (
-        $DB->request([
+        getDB()->request([
             'FROM' => 'glpi_notificationtemplates',
             'WHERE' => $options
         ]) as $data
@@ -246,7 +315,7 @@ function plugin_additionalalerts_uninstall()
         ];
 
         foreach (
-            $DB->request([
+            getDB()->request([
                 'FROM' => 'glpi_notificationtemplatetranslations',
                 'WHERE' => $options_template
             ]) as $data_template
@@ -256,7 +325,7 @@ function plugin_additionalalerts_uninstall()
         $template->delete($data);
 
         foreach (
-            $DB->request([
+            getDB()->request([
                 'FROM' => 'glpi_notifications_notificationtemplates',
                 'WHERE' => $options_template
             ]) as $data_template
@@ -268,7 +337,7 @@ function plugin_additionalalerts_uninstall()
     $notif = new Notification();
     $options = ['itemtype' => TicketUnresolved::class];
     foreach (
-        $DB->request([
+        getDB()->request([
             'FROM' => 'glpi_notifications',
             'WHERE' => $options
         ]) as $data
@@ -282,7 +351,7 @@ function plugin_additionalalerts_uninstall()
     $notif_template = new Notification_NotificationTemplate();
     $options = ['itemtype' => TicketUnresolved::class];
     foreach (
-        $DB->request([
+        getDB()->request([
             'FROM' => 'glpi_notificationtemplates',
             'WHERE' => $options
         ]) as $data
@@ -292,7 +361,7 @@ function plugin_additionalalerts_uninstall()
         ];
 
         foreach (
-            $DB->request([
+            getDB()->request([
                 'FROM' => 'glpi_notificationtemplatetranslations',
                 'WHERE' => $options_template
             ]) as $data_template
@@ -302,7 +371,7 @@ function plugin_additionalalerts_uninstall()
         $template->delete($data);
 
         foreach (
-            $DB->request([
+            getDB()->request([
                 'FROM' => 'glpi_notifications_notificationtemplates',
                 'WHERE' => $options_template
             ]) as $data_template
@@ -331,6 +400,7 @@ function plugin_additionalalerts_uninstall()
  */
 function plugin_additionalalerts_getDatabaseRelations()
 {
+    global $DB;
     $links = [];
     if (\GlpiPlugin\Additionalalerts\Plugin::isPluginActive("additionalalerts")) {
         $links = [
@@ -360,268 +430,59 @@ function install_notifications_additionalalerts()
     // Request
     $options_notif        = ['itemtype' => InkAlert::class,
         'name' => 'Alert ink level'];
-    $DB->insert(
+    getDB()->insert(
         "glpi_notificationtemplates",
         $options_notif
     );
 
-    foreach ($DB->request([
+    foreach (getDB()->request([
         'FROM' => 'glpi_notificationtemplates',
         'WHERE' => $options_notif]) as $data) {
         $templates_id = $data['id'];
 
-        if ($templates_id) {
-            $DB->insert(
-                "glpi_notificationtemplatetranslations",
-                [
-                    'notificationtemplates_id' => $templates_id,
-                    'subject' => '##lang.ink.title## : ##ink.entity##',
-                    'content_text' => '##lang.ink.title## :
-          ##FOREACHinks##
-          - ##ink.printer## - ##ink.cartridge## - ##ink.state##%
-          ##ENDFOREACHinks##',
-                    'content_html' => '&lt;table class=\"tab_cadre\" border=\"1\" cellspacing=\"2\" cellpadding=\"3\"&gt;
-          &lt;tbody&gt;
-          &lt;tr&gt;
-          &lt;td style=\"text-align: left;\" bgcolor=\"#cccccc\"&gt;&lt;span style=\"font-family: Verdana; font-size: 11px; text-align: left;\"&gt;##lang.ink.printer##&lt;/span&gt;&lt;/td&gt;
-          &lt;td style=\"text-align: left;\" bgcolor=\"#cccccc\"&gt;&lt;span style=\"font-family: Verdana; font-size: 11px; text-align: left;\"&gt;##lang.ink.cartridge##&lt;/span&gt;&lt;/td&gt;
-          &lt;td style=\"text-align: left;\" bgcolor=\"#cccccc\"&gt;&lt;span style=\"font-family: Verdana; font-size: 11px; text-align: left;\"&gt;##lang.ink.state##&lt;/span&gt;&lt;/td&gt;
-          &lt;/tr&gt;
-          ##FOREACHinks##
-          &lt;tr&gt;
-          &lt;td&gt;&lt;a href=\"##ink.urlprinter##\"&gt;&lt;span style=\"font-family: Verdana; font-size: 11px; text-align: left;\"&gt;##ink.printer##&lt;/span&gt;&lt;/a&gt;&lt;/td&gt;
-          &lt;td&gt;&lt;a href=\"##ink.urlcartridge##\"&gt;&lt;span style=\"font-family: Verdana; font-size: 11px; text-align: left;\"&gt;##ink.cartridge##&lt;/span&gt;&lt;/a&gt;&lt;/td&gt;
-          &lt;td&gt;&lt;span style=\"font-family: Verdana; font-size: 11px; text-align: left;\"&gt;##ink.state##%&lt;/span&gt;&lt;/td&gt;
-          &lt;/tr&gt;
-          ##ENDFOREACHinks##
-          &lt;/tbody&gt;
-          &lt;/table&gt;',
-                ]
-            );
-
-            $DB->insert(
-                "glpi_notifications",
-                [
-                    'name' => 'Alert ink level',
-                    'entities_id' => 0,
-                    'itemtype' => InkAlert::class,
-                    'event' => 'ink',
-                    'is_recursive' => 1,
-                ]
-            );
-
-            $options_notif        = ['itemtype' => InkAlert::class,
-                'name' => 'Alert ink level',
-                'event' => 'ink'];
-
-            foreach ($DB->request([
-                'FROM' => 'glpi_notifications',
-                'WHERE' => $options_notif]) as $data_notif) {
-                $notification = $data_notif['id'];
-                if ($notification) {
-                    $DB->insert(
-                        "glpi_notifications_notificationtemplates",
-                        [
-                            'notifications_id' => $notification,
-                            'mode' => 'mailing',
-                            'notificationtemplates_id' => $templates_id,
-                        ]
-                    );
-                }
+        $itemtype = 'GlpiPlugin\\Additionalalerts\\InkAlert';
+        $sql = "INSERT INTO glpi_notificationtemplates (itemtype, name) VALUES ('{$itemtype}', 'Alert ink level')";
+        getDB()->query($sql);
+        $template_id = getDB()->insert_id ? getDB()->insert_id : null;
+        if ($template_id) {
+            $subject = '##lang.ink.title## : ##ink.entity##';
+            $content_text = '##lang.ink.title## :\n          ##FOREACHinks##\n          - ##ink.printer## - ##ink.cartridge## - ##ink.state##%\n          ##ENDFOREACHinks##';
+            $content_html = '&lt;table class=\"tab_cadre\" border=\"1\" cellspacing=\"2\" cellpadding=\"3\"&gt;\n          &lt;tbody&gt;\n          &lt;tr&gt;\n          &lt;td style=\"text-align: left;\" bgcolor=\"#cccccc\"&gt;&lt;span style=\"font-family: Verdana; font-size: 11px; text-align: left;\"&gt;##lang.ink.printer##&lt;/span&gt;&lt;/td&gt;\n          &lt;td style=\"text-align: left;\" bgcolor=\"#cccccc\"&gt;&lt;span style=\"font-family: Verdana; font-size: 11px; text-align: left;\"&gt;##lang.ink.cartridge##&lt;/span&gt;&lt;/td&gt;\n          &lt;td style=\"text-align: left;\" bgcolor=\"#cccccc\"&gt;&lt;span style=\"font-family: Verdana; font-size: 11px; text-align: left;\"&gt;##lang.ink.state##&lt;/span&gt;&lt;/td&gt;\n          &lt;/tr&gt;\n          ##FOREACHinks##\n          &lt;tr&gt;\n          &lt;td&gt;&lt;a href=\"##ink.urlprinter##\"&gt;&lt;span style=\"font-family: Verdana; font-size: 11px; text-align: left;\"&gt;##ink.printer##&lt;/span&gt;&lt;/a&gt;&lt;/td&gt;\n          &lt;td&gt;&lt;a href=\"##ink.urlcartridge##\"&gt;&lt;span style=\"font-family: Verdana; font-size: 11px; text-align: left;\"&gt;##ink.cartridge##&lt;/span&gt;&lt;/a&gt;&lt;/td&gt;\n          &lt;td&gt;&lt;span style=\"font-family: Verdana; font-size: 11px; text-align: left;\"&gt;##ink.state##%&lt;/span&gt;&lt;/td&gt;\n          &lt;/tr&gt;\n          ##ENDFOREACHinks##\n          &lt;/tbody&gt;\n          &lt;/table&gt;';
+            $sql = "INSERT INTO glpi_notificationtemplatetranslations (notificationtemplates_id, subject, content_text, content_html) VALUES ({$template_id}, '" . addslashes($subject) . "', '" . addslashes($content_text) . "', '" . addslashes($content_html) . "')";
+            getDB()->query($sql);
+            $sql = "INSERT INTO glpi_notifications (name, entities_id, itemtype, event, is_recursive) VALUES ('Alert ink level', 0, '{$itemtype}', 'ink', 1)";
+            getDB()->query($sql);
+            $notification_id = getDB()->insert_id ? getDB()->insert_id : null;
+            if ($notification_id) {
+                $sql = "INSERT INTO glpi_notifications_notificationtemplates (notifications_id, mode, notificationtemplates_id) VALUES ({$notification_id}, 'mailing', {$template_id})";
+                getDB()->query($sql);
             }
         }
-    }
-
-    // Alert infocoms
-    $options_notif        = ['itemtype' => InfocomAlert::class,
-        'name' => 'Alert infocoms'];
-
-    $DB->insert(
-        "glpi_notificationtemplates",
-        $options_notif
-    );
-
-    foreach ($DB->request([
-        'FROM' => 'glpi_notificationtemplates',
-        'WHERE' => $options_notif]) as $data) {
-        $templates_id = $data['id'];
-
-        if ($templates_id) {
-            $DB->insert(
-                "glpi_notificationtemplatetranslations",
-                [
-                    'notificationtemplates_id' => $templates_id,
-                    'subject' => '##lang.notinfocom.title## : ##notinfocom.entity##',
-                    'content_text' => '##FOREACHnotinfocoms##
-       ##lang.notinfocom.name## : ##notinfocom.name##
-       ##lang.notinfocom.computertype## : ##notinfocom.computertype##
-       ##lang.notinfocom.operatingsystem## : ##notinfocom.operatingsystem##
-       ##lang.notinfocom.state## : ##notinfocom.state##
-       ##lang.notinfocom.location## : ##notinfocom.location##
-       ##lang.notinfocom.user## : ##notinfocom.user## / ##notinfocom.group## / ##notinfocom.contact##
-       ##ENDFOREACHnotinfocoms##',
-                    'content_html' => '&lt;table class=\"tab_cadre\" border=\"1\" cellspacing=\"2\" cellpadding=\"3\"&gt;
-       &lt;tbody&gt;
-       &lt;tr&gt;
-       &lt;td style=\"text-align: left;\" bgcolor=\"#cccccc\"&gt;&lt;span style=\"font-family: Verdana; font-size: 11px; text-align: left;\"&gt;##lang.notinfocom.name##&lt;/span&gt;&lt;/td&gt;
-       &lt;td style=\"text-align: left;\" bgcolor=\"#cccccc\"&gt;&lt;span style=\"font-family: Verdana; font-size: 11px; text-align: left;\"&gt;##lang.notinfocom.computertype##&lt;/span&gt;&lt;/td&gt;
-       &lt;td style=\"text-align: left;\" bgcolor=\"#cccccc\"&gt;&lt;span style=\"font-family: Verdana; font-size: 11px; text-align: left;\"&gt;##lang.notinfocom.operatingsystem##&lt;/span&gt;&lt;/td&gt;
-       &lt;td style=\"text-align: left;\" bgcolor=\"#cccccc\"&gt;&lt;span style=\"font-family: Verdana; font-size: 11px; text-align: left;\"&gt;##lang.notinfocom.state##&lt;/span&gt;&lt;/td&gt;
-       &lt;td style=\"text-align: left;\" bgcolor=\"#cccccc\"&gt;&lt;span style=\"font-family: Verdana; font-size: 11px; text-align: left;\"&gt;##lang.notinfocom.location##&lt;/span&gt;&lt;/td&gt;
-       &lt;td style=\"text-align: left;\" bgcolor=\"#cccccc\"&gt;&lt;span style=\"font-family: Verdana; font-size: 11px; text-align: left;\"&gt;##lang.notinfocom.user##&lt;/span&gt;&lt;/td&gt;
-       &lt;/tr&gt;
-       ##FOREACHnotinfocoms##
-       &lt;tr&gt;
-       &lt;td&gt;&lt;a href=\"##notinfocom.urlname##\"&gt;&lt;span style=\"font-family: Verdana; font-size: 11px; text-align: left;\"&gt;##notinfocom.name##&lt;/span&gt;&lt;/a&gt;&lt;/td&gt;
-       &lt;td&gt;&lt;span style=\"font-family: Verdana; font-size: 11px; text-align: left;\"&gt;##notinfocom.computertype##&lt;/span&gt;&lt;/td&gt;
-       &lt;td&gt;&lt;span style=\"font-family: Verdana; font-size: 11px; text-align: left;\"&gt;##notinfocom.operatingsystem##&lt;/span&gt;&lt;/td&gt;
-       &lt;td&gt;&lt;span style=\"font-family: Verdana; font-size: 11px; text-align: left;\"&gt;##notinfocom.state##&lt;/span&gt;&lt;/td&gt;
-       &lt;td&gt;&lt;span style=\"font-family: Verdana; font-size: 11px; text-align: left;\"&gt;##notinfocom.location##&lt;/span&gt;&lt;/td&gt;
-       &lt;td&gt;&lt;a href=\"##notinfocom.urluser##\"&gt;&lt;span style=\"font-family: Verdana; font-size: 11px; text-align: left;\"&gt;##notinfocom.user##&lt;/span&gt;&lt;/a&gt; / &lt;a href=\"##notinfocom.urlgroup##\"&gt;&lt;span style=\"font-family: Verdana; font-size: 11px; text-align: left;\"&gt;##notinfocom.group##&lt;/span&gt;&lt;/a&gt; / &lt;span style=\"font-family: Verdana; font-size: 11px; text-align: left;\"&gt;##notinfocom.contact##&lt;/span&gt;&lt;/td&gt;
-       &lt;/tr&gt;
-       ##ENDFOREACHnotinfocoms##
-       &lt;/tbody&gt;
-       &lt;/table&gt;',
-                ]
-            );
-
-            $DB->insert(
-                "glpi_notifications",
-                [
-                    'name' => 'Alert infocoms',
-                    'entities_id' => 0,
-                    'itemtype' => InfocomAlert::class,
-                    'event' => 'notinfocom',
-                    'is_recursive' => 1,
-                ]
-            );
-
-            $options_notif = [
-                'itemtype' => InfocomAlert::class,
-                'name' => 'Alert infocoms',
-                'event' => 'notinfocom'
-            ];
-
-            foreach (
-                $DB->request([
-                    'FROM' => 'glpi_notifications',
-                    'WHERE' => $options_notif
-                ]) as $data_notif
-            ) {
-                $notification = $data_notif['id'];
-                if ($notification) {
-                    $DB->insert(
-                        "glpi_notifications_notificationtemplates",
-                        [
-                            'notifications_id' => $notification,
-                            'mode' => 'mailing',
-                            'notificationtemplates_id' => $templates_id,
-                        ]
-                    );
-                }
-            }
         }
 
         // Alert Ticket Unresolved
-        $options_notif = [
-            'itemtype' => TicketUnresolved::class,
-            'name' => 'Alert Ticket Unresolved'
-        ];
-
-        $DB->insert(
-            "glpi_notificationtemplates",
-            $options_notif
-        );
-
-        foreach (
-            $DB->request([
-                'FROM' => 'glpi_notificationtemplates',
-                'WHERE' => $options_notif
-            ]) as $data
-        ) {
-            $templates_id = $data['id'];
-
-            if ($templates_id) {
-                $DB->insert(
-                    "glpi_notificationtemplatetranslations",
-                    [
-                        'notificationtemplates_id' => $templates_id,
-                        'subject' => '##ticket.action## ##ticket.entity##',
-                        'content_text' => '##ticket.action## ##ticket.entity##
-         ##FOREACHtickets##
-
-          ##lang.ticket.title## : ##ticket.title##
-           ##lang.ticket.status## : ##ticket.status##
-
-           ##ticket.url##
-           ##ENDFOREACHtickets##',
-                        'content_html' => '&lt;table class=\"tab_cadre\" border=\"1\" cellspacing=\"2\" cellpadding=\"3\"&gt;
-    &lt;tbody&gt;
-    &lt;tr&gt;
-    &lt;td style=\"text-align: left;\" width=\"auto\" bgcolor=\"#95bde4\"&gt;&lt;span style=\"font-family: Verdana; font-size: 11px; text-align: left;\"&gt;##lang.ticket.authors##&lt;/span&gt;&lt;/td&gt;
-    &lt;td style=\"text-align: left;\" width=\"auto\" bgcolor=\"#95bde4\"&gt;&lt;span style=\"font-family: Verdana; font-size: 11px; text-align: left;\"&gt;##lang.ticket.title##&lt;/span&gt;&lt;/td&gt;
-    &lt;td style=\"text-align: left;\" width=\"auto\" bgcolor=\"#95bde4\"&gt;&lt;span style=\"font-family: Verdana; font-size: 11px; text-align: left;\"&gt;##lang.ticket.priority##&lt;/span&gt;&lt;/td&gt;
-    &lt;td style=\"text-align: left;\" width=\"auto\" bgcolor=\"#95bde4\"&gt;&lt;span style=\"font-family: Verdana; font-size: 11px; text-align: left;\"&gt;##lang.ticket.status##&lt;/span&gt;&lt;/td&gt;
-    &lt;td style=\"text-align: left;\" width=\"auto\" bgcolor=\"#95bde4\"&gt;&lt;span style=\"font-family: Verdana; font-size: 11px; text-align: left;\"&gt;##lang.ticket.attribution##&lt;/span&gt;&lt;/td&gt;
-    &lt;td style=\"text-align: left;\" width=\"auto\" bgcolor=\"#95bde4\"&gt;&lt;span style=\"font-family: Verdana; font-size: 11px; text-align: left;\"&gt;##lang.ticket.creationdate##&lt;/span&gt;&lt;/td&gt;
-    &lt;td style=\"text-align: left;\" width=\"auto\" bgcolor=\"#95bde4\"&gt;&lt;span style=\"font-family: Verdana; font-size: 11px; text-align: left;\"&gt;##lang.ticket.content##&lt;/span&gt;&lt;/td&gt;
-    &lt;/tr&gt;
-    ##FOREACHtickets##
-    &lt;tr&gt;
-    &lt;td width=\"auto\"&gt;&lt;span style=\"font-family: Verdana; font-size: 11px; text-align: left;\"&gt;##ticket.authors##&lt;/span&gt;&lt;/td&gt;
-    &lt;td width=\"auto\"&gt;&lt;span style=\"font-family: Verdana; font-size: 11px; text-align: left;\"&gt;&lt;a href=\"##ticket.url##\"&gt;##ticket.title##&lt;/a&gt;&lt;/span&gt;&lt;/td&gt;
-    &lt;td width=\"auto\"&gt;&lt;span style=\"font-family: Verdana; font-size: 11px; text-align: left;\"&gt;##ticket.priority##&lt;/span&gt;&lt;/td&gt;
-    &lt;td width=\"auto\"&gt;&lt;span style=\"font-family: Verdana; font-size: 11px; text-align: left;\"&gt;##ticket.status##&lt;/span&gt;&lt;/td&gt;
-    &lt;td width=\"auto\"&gt;&lt;span style=\"font-family: Verdana; font-size: 11px; text-align: left;\"&gt;##IFticket.assigntousers####ticket.assigntousers##&lt;br /&gt;##ENDIFticket.assigntousers####IFticket.assigntogroups##&lt;br /&gt;##ticket.assigntogroups## ##ENDIFticket.assigntogroups####IFticket.assigntosupplier##&lt;br /&gt;##ticket.assigntosupplier## ##ENDIFticket.assigntosupplier##&lt;/span&gt;&lt;/td&gt;
-    &lt;td width=\"auto\"&gt;&lt;span style=\"font-family: Verdana; font-size: 11px; text-align: left;\"&gt;##ticket.creationdate##&lt;/span&gt;&lt;/td&gt;
-    &lt;td width=\"auto\"&gt;&lt;span style=\"font-family: Verdana; font-size: 11px; text-align: left;\"&gt;##ticket.content##&lt;/span&gt;&lt;/td&gt;
-    &lt;/tr&gt;
-    ##ENDFOREACHtickets##
-    &lt;/tbody&gt;
-    &lt;/table&gt;',
-                    ]
-                );
-
-                $DB->insert(
-                    "glpi_notifications",
-                    [
-                        'name' => 'Alert Ticket Unresolved',
-                        'entities_id' => 0,
-                        'itemtype' => TicketUnresolved::class,
-                        'event' => 'ticketunresolved',
-                        'is_recursive' => 1,
-                    ]
-                );
-
-                $options_notif = [
-                    'itemtype' => TicketUnresolved::class,
-                    'name' => 'Alert Ticket Unresolved',
-                    'event' => 'ticketunresolved'
-                ];
-
-                foreach (
-                    $DB->request([
-                        'FROM' => 'glpi_notifications',
-                        'WHERE' => $options_notif
-                    ]) as $data_notif
-                ) {
-                    $notification = $data_notif['id'];
-                    if ($notification) {
-                        $DB->insert(
-                            "glpi_notifications_notificationtemplates",
-                            [
-                                'notifications_id' => $notification,
-                                'mode' => 'mailing',
-                                'notificationtemplates_id' => $templates_id,
-                            ]
-                        );
-                    }
-                }
+        // Alert Ticket Unresolved
+        $itemtype = 'GlpiPlugin\\Additionalalerts\\TicketUnresolved';
+        $sql = "INSERT INTO glpi_notificationtemplates (itemtype, name) VALUES ('{$itemtype}', 'Alert Ticket Unresolved')";
+        getDB()->query($sql);
+        $template_id = getDB()->insert_id ? getDB()->insert_id : null;
+        if ($template_id) {
+            $subject = '##ticket.action## ##ticket.entity##';
+            $content_text = '##ticket.action## ##ticket.entity##\n         ##FOREACHtickets##\n\n          ##lang.ticket.title## : ##ticket.title##\n           ##lang.ticket.status## : ##ticket.status##\n\n           ##ticket.url##\n           ##ENDFOREACHtickets##';
+            $content_html = '&lt;table class=\"tab_cadre\" border=\"1\" cellspacing=\"2\" cellpadding=\"3\"&gt;\n    &lt;tbody&gt;\n    &lt;tr&gt;\n    &lt;td style=\"text-align: left;\" width=\"auto\" bgcolor=\"#95bde4\"&gt;&lt;span style=\"font-family: Verdana; font-size: 11px; text-align: left;\"&gt;##lang.ticket.authors##&lt;/span&gt;&lt;/td&gt;\n    &lt;td style=\"text-align: left;\" width=\"auto\" bgcolor=\"#95bde4\"&gt;&lt;span style=\"font-family: Verdana; font-size: 11px; text-align: left;\"&gt;##lang.ticket.title##&lt;/span&gt;&lt;/td&gt;';
+            $sql = "INSERT INTO glpi_notificationtemplatetranslations (notificationtemplates_id, subject, content_text, content_html) VALUES ({$template_id}, '" . addslashes($subject) . "', '" . addslashes($content_text) . "', '" . addslashes($content_html) . "')";
+            getDB()->query($sql);
+            $sql = "INSERT INTO glpi_notifications (name, entities_id, itemtype, event, is_recursive) VALUES ('Alert Ticket Unresolved', 0, '{$itemtype}', 'ticketunresolved', 1)";
+            getDB()->query($sql);
+            $notification_id = getDB()->insert_id ? getDB()->insert_id : null;
+            if ($notification_id) {
+                $sql = "INSERT INTO glpi_notifications_notificationtemplates (notifications_id, mode, notificationtemplates_id) VALUES ({$notification_id}, 'mailing', {$template_id})";
+                getDB()->query($sql);
             }
         }
+        // ...existing code for migration and return...
 
+        // ...existing code for migration and return...
         $migration->executeMigration();
         return true;
-    }
-}
 
